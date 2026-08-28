@@ -3,57 +3,49 @@
 Gera as 10 mídias 1080x1350 da campanha de captação da Grego's
 (Campo Limpo Paulista · Várzea Paulista · Jundiaí).
 
-## Sistema visual
+## Padrão visual
 
-Calcado na peça de referência da marca ("4 NOVOS GREGO'S"):
+Calcado no story de referência do próprio perfil, "Hoje pede Grego's.".
+Estrutura igual nas 10 peças:
+
+1. foto sangrando no topo (~59% da altura), dissolvendo num fade de
+   210px até o preto — sem moldura, sem card;
+2. wordmark `GREGO'S` pequeno e centralizado sobre a foto, com `®`;
+3. headline creme, centralizada, em **caixa baixa** e terminada em
+   **ponto final** — é a assinatura de voz da marca;
+4. sub em cinza quente, uma linha;
+5. pílula branca de CTA com ícone de corrente + `PEÇA AGORA!`;
+6. as três praças em caixa alta, pequenas, no rodapé.
 
 | Token | Hex | Uso |
 |---|---|---|
-| Vinho claro | `#8A1523` | centro do fundo radial |
-| Vinho escuro | `#560C16` | bordas do fundo, rodapé |
-| Vermelho Grego's | `#E8232A` | blob do wordmark, selo estrela |
-| Vermelho escuro | `#B0141C` | contorno do wordmark |
-| Creme | `#F6F0E1` | toda a tipografia |
+| Preto | `#0D0D0D` | fundo |
+| Creme | `#F2ECDD` | headline e wordmark |
+| Cinza quente | `#968F82` | sub e praças |
+| Branco | `#FFFFFF` | pílula de CTA |
+| Vermelho Grego's | `#E8232A` | texto e ícone da pílula |
 
-Elementos de assinatura: fundo vinho radial, wordmark bubbly sobre blob
-vermelho, selo estrela de 12 pontas, faixa xadrez e card de foto com
-cantos arredondados.
-
-Tipografia: Nunito 900 (headline), Chewy (wordmark/selo), Baloo 2 700
-(apoio), Caveat 700 (manuscrito), Inter (CTA).
-
-## Camada humanizada
-
-O que impede o conjunto de parecer template:
-
-- recado manuscrito em cada peça, escrito torto;
-- traço de marcador sob a headline — três passadas com tremido e ponta
-  que escapa, em vez de uma barra reta;
-- selo estrela colado torto (-11° a +9°), como adesivo;
-- card de foto girado 1 a 2 graus, preso por fita adesiva translúcida
-  nos cantos.
-
-Nenhum eixo fica perfeitamente alinhado, de propósito. As peças 07 e 09
-usam clientes reais da loja no lugar do modelo de estúdio.
+Tipografia: Nunito 900 (headline), Chewy (wordmark), Inter 500/700
+(sub e CTA).
 
 > O wordmark é reconstrução tipográfica — o arquivo oficial do logo não
-> estava disponível. Substituir por `logo_oficial.png` quando houver.
+> estava disponível. Substituir quando houver.
 
-## Layouts
+### Uma diferença proposital em relação ao story
 
-- `cartaz` — vinho + headline centralizada no topo + card de foto com fita
-- `split` — foto no topo + faixa xadrez + bloco vinho com headline
-- `full` — foto sangrando + véu vinho + headline na base
+No story, o `PEÇA AGORA!` é o sticker de link do Instagram: azul e
+clicável. No feed esse botão não clica, então a pílula mantém a forma
+mas usa o vermelho da marca no lugar do azul — fica na identidade sem
+parecer um botão morto. Nos stories, use o sticker nativo por cima.
 
 ## Uso
 
 ```bash
 pip install pillow
-python3 build_artes.py       # escreve em artes3/
+python3 build_artes.py       # escreve em artes4/
 ```
 
 As fotos de origem ficam em `fotos/` e as fontes em `fonts/` (Google
-Fonts). Para trocar headline, foto, selo ou recorte, edite a lista
+Fonts). Para trocar foto, headline, sub ou enquadramento, edite a lista
 `PECAS` no fim do script — cada peça aceita `foto`, `focus`, `zoom`,
-`tilt`, `badge`, `badge_rot`, `head`, `hand`, `hand_rot`, `sub`, `lay`
-e `mark`.
+`band`, `head`, `sub`, `cta` e `mark`.
