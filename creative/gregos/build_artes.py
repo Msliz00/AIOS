@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-GREGO'S — feed Instagram 1080x1350.
-Sistema calcado na peca de referencia enviada pelo cliente:
-fundo vinho radial, tipografia creme arredondada, wordmark bubbly
-sobre blob vermelho, selo estrela e faixa xadrez no rodape.
+GREGO'S — feed Instagram 1080x1350 (versao humanizada).
+
+Mesma identidade da peca de referencia (vinho, creme, blob vermelho,
+selo estrela, xadrez), mas com o grid quebrado de proposito: adesivos
+tortos, traco de marcador feito a mao, recado manuscrito e foto colada
+levemente torta. Duas pecas trocam o modelo de estudio por cliente real.
 """
-import os, math
+import os, math, random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
 S = "/tmp/claude-0/-home-user-AIOS/6f054a58-1907-5469-9055-58632a643f99/scratchpad"
-FOTOS, FONTS, OUT = S + "/fotos/", S + "/fonts/", S + "/artes2/"
+FOTOS, FONTS, OUT = S + "/fotos/", S + "/fonts/", S + "/artes3/"
 os.makedirs(OUT, exist_ok=True)
 
 W, H = 1080, 1350
@@ -21,11 +23,11 @@ WINE_LO = (86, 12, 22)
 RED     = (232, 35, 42)
 RED_DK  = (176, 20, 28)
 CREAM   = (246, 240, 225)
-INK     = (44, 8, 12)
 
-F_HEAD = FONTS + "Nunito900.ttf"        # headline (match da referencia)
-F_MARK = FONTS + "Chewy.ttf"            # wordmark / selos bubbly
-F_SUB  = FONTS + "Baloo700.ttf"         # apoio
+F_HEAD = FONTS + "Nunito900.ttf"
+F_MARK = FONTS + "Chewy.ttf"
+F_SUB  = FONTS + "Baloo700.ttf"
+F_HAND = FONTS + "Caveat700.ttf"     # recado manuscrito
 F_UI   = FONTS + "Inter700.ttf"
 F_UIM  = FONTS + "Inter500.ttf"
 
@@ -39,12 +41,12 @@ def tw(d, t, f, tk=0):
     return d.textlength(t, font=f) + tk * max(len(t) - 1, 0)
 
 
-def tracked(d, xy, t, f, fill, tk=0, right=False, **kw):
+def tracked(d, xy, t, f, fill, tk=0, right=False):
     x, y = xy
     if right:
         x -= tw(d, t, f, tk)
     for ch in t:
-        d.text((x, y), ch, font=f, fill=fill, **kw)
+        d.text((x, y), ch, font=f, fill=fill)
         x += d.textlength(ch, font=f) + tk
     return x
 
@@ -62,7 +64,7 @@ def wrap(d, t, f, maxw):
     return out
 
 
-def adv_of(f, lines, size, extra=0.13):
+def adv_of(f, lines, size, extra=0.16):
     ct = f.getbbox("H")[1]; cb = f.getbbox("H")[3]
     rise = max(0, ct - min(f.getbbox(l)[1] for l in lines))
     drop = max(0, max(f.getbbox(l)[3] for l in lines) - cb)
@@ -84,19 +86,89 @@ def fit(d, t, path, maxw, maxh, hi, lo, extra=0.16, max_lines=3):
     return f, ls, lo, a, a * (len(ls) - 1) + (f.getbbox("H")[3] - f.getbbox("H")[1])
 
 
-def put_lines(d, x, ytop, lines, f, fill, adv, center=None, **kw):
+def put_lines(d, x, ytop, lines, f, fill, adv, center=None):
     ct = f.getbbox("H")[1]
     y = ytop
     for l in lines:
         px = x if center is None else center - d.textlength(l, font=f) / 2
-        d.text((px, y - ct), l, font=f, fill=fill, **kw)
+        d.text((px, y - ct), l, font=f, fill=fill)
         y += adv
     return y - adv + (f.getbbox("H")[3] - ct)
 
 
+# ------------------------------------------------------------ mao / textura
+def paste_rot(base, layer, center, angle):
+    """Cola uma camada girada — e o que tira o ar de template."""
+    rl = layer.rotate(angle, resample=Image.BICUBIC, expand=True)
+    base.alpha_composite(rl, (int(center[0] - rl.width / 2),
+                              int(center[1] - rl.height / 2)))
+
+
+def rough_line(d, x0, y0, x1, color=RED, weight=11, rng=None):
+    """Traco de marcador: varias passadas com tremido, nao uma barra reta."""
+    rng = rng or random.Random(7)
+    span = x1 - x0
+    for p in range(3):
+        pts = []
+        n = 16
+        for i in range(n + 1):
+            t = i / n
+            x = x0 + span * t
+            y = y0 + math.sin(t * 3.1 + p) * 1.9 + rng.uniform(-1.6, 1.6) + p * 0.9
+            pts.append((x, y))
+        d.line(pts, fill=color, width=max(3, weight - p * 3), joint="curve")
+    # ponta que escapa, como caneta de verdade
+    d.line([(x1, y0 + 2), (x1 + span * 0.05, y0 - 2)], fill=color, width=4)
+
+
+def hand_note(base, x, y, text, size=52, color=CREAM, angle=-3.0, anchor="left"):
+    """Recado manuscrito — como se alguem tivesse escrito na arte."""
+    f = font(F_HAND, size)
+    tmp = Image.new("RGBA", (1, 1))
+    wpx = int(ImageDraw.Draw(tmp).textlength(text, font=f)) + 40
+    lay = Image.new("RGBA", (wpx, int(size * 1.9)), (0, 0, 0, 0))
+    ImageDraw.Draw(lay).text((20, size * 0.25), text, font=f, fill=color)
+    cx = x + wpx / 2 if anchor == "left" else x - wpx / 2
+    paste_rot(base, lay, (cx, y + size * 0.9), angle)
+    return wpx
+
+
+def sticker_star(base, cx, cy, r, lines, angle=-9.0, fill=RED, ink=CREAM):
+    """Selo estrela colado torto, como adesivo."""
+    pad = int(r * 1.5)
+    lay = Image.new("RGBA", (pad * 2, pad * 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    pts, pts_in = [], []
+    for i in range(24):
+        a = i * math.pi / 12
+        rr = r if i % 2 == 0 else r * 0.79
+        pts.append((pad + rr * math.cos(a), pad + rr * math.sin(a)))
+    d.polygon(pts, fill=CREAM + (255,))
+    for p in pts:
+        pts_in.append((pad + (p[0] - pad) * 0.92, pad + (p[1] - pad) * 0.92))
+    d.polygon(pts_in, fill=fill)
+    fs = int(r * 0.35)
+    f = font(F_MARK, fs)
+    y = pad - len(lines) * fs * 1.02 / 2
+    for l in lines:
+        d.text((pad - d.textlength(l, font=f) / 2, y - f.getbbox("H")[1] * 0.62),
+               l, font=f, fill=ink)
+        y += fs * 1.02
+    paste_rot(base, lay, (cx, cy), angle)
+
+
+def tape(base, cx, cy, w=132, h=38, angle=-24.0):
+    """Fita adesiva translucida segurando a foto no lugar."""
+    lay = Image.new("RGBA", (w + 8, h + 8), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    d.rectangle([4, 4, w + 3, h + 3], fill=(252, 248, 236, 128))
+    d.line([(4, 4), (w + 3, 4)], fill=(255, 255, 255, 150), width=2)
+    d.line([(4, h + 3), (w + 3, h + 3)], fill=(120, 90, 70, 60), width=2)
+    paste_rot(base, lay.filter(ImageFilter.GaussianBlur(0.5)), (cx, cy), angle)
+
+
 # -------------------------------------------------------------- graficos
 def wine_bg():
-    """Fundo vinho radial, como no cartaz de referencia."""
     g = Image.new("RGB", (W, H), WINE_LO)
     px = g.load()
     cx, cy, mx = W * 0.5, H * 0.30, math.hypot(W * 0.5, H * 0.72)
@@ -116,214 +188,211 @@ def cover(path, bw, bh, fx=0.5, fy=0.5, zoom=1.0):
     sc = max(bw / sw, bh / sh) * zoom
     im = im.resize((math.ceil(sw * sc), math.ceil(sh * sc)), Image.LANCZOS)
     nw, nh = im.size
-    im = im.crop((int((nw - bw) * fx), int((nh - bh) * fy),
-                  int((nw - bw) * fx) + bw, int((nh - bh) * fy) + bh))
+    l, t = int((nw - bw) * fx), int((nh - bh) * fy)
+    im = im.crop((l, t, l + bw, t + bh))
     im = ImageEnhance.Color(im).enhance(1.16)
     im = ImageEnhance.Contrast(im).enhance(1.08)
     return im.filter(ImageFilter.UnsharpMask(radius=2, percent=60, threshold=3))
 
 
-def round_panel(img, photo, box, radius=44, ring=8):
-    """Cola a foto num painel de cantos arredondados com anel creme."""
-    x0, y0, x1, y1 = box
-    m = Image.new("L", (x1 - x0, y1 - y0), 0)
-    ImageDraw.Draw(m).rounded_rectangle([0, 0, x1 - x0 - 1, y1 - y0 - 1], radius=radius, fill=255)
-    if ring:
-        d = ImageDraw.Draw(img, "RGBA")
-        d.rounded_rectangle([x0 - ring, y0 - ring, x1 + ring, y1 + ring],
-                            radius=radius + ring, fill=CREAM + (255,))
-    img.paste(photo, (x0, y0), m)
+def photo_card(base, photo, center, angle=-1.6, radius=34, border=16):
+    """Foto colada meio torta, com borda creme — cara de foto impressa."""
+    pw, ph = photo.size
+    lay = Image.new("RGBA", (pw + border * 2, ph + border * 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    d.rounded_rectangle([0, 0, lay.width - 1, lay.height - 1],
+                        radius=radius + border, fill=CREAM + (255,))
+    m = Image.new("L", (pw, ph), 0)
+    ImageDraw.Draw(m).rounded_rectangle([0, 0, pw - 1, ph - 1], radius=radius, fill=255)
+    lay.paste(photo, (border, border), m)
+    paste_rot(base, lay, center, angle)
 
 
-def checker(d, y, h=34, cell=45, color=CREAM, offset=0):
-    """Faixa xadrez — elemento de assinatura da marca."""
-    n = W // cell + 2
-    for i in range(n):
+def checker(d, y, h=30, cell=45, color=CREAM, offset=0):
+    for i in range(W // cell + 2):
         if (i + offset) % 2 == 0:
             d.rectangle([i * cell, y, i * cell + cell, y + h], fill=color)
 
 
-def star_badge(img, cx, cy, r, lines, points=12, fill=RED, ink=CREAM, rot=0.0):
-    """Selo estrela (tipo 'NOVO MENU' da referencia)."""
-    d = ImageDraw.Draw(img, "RGBA")
-    pts = []
-    for i in range(points * 2):
-        a = rot + i * math.pi / points
-        rr = r if i % 2 == 0 else r * 0.80
-        pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
-    d.polygon(pts, fill=CREAM + (255,))
-    pts2 = [(cx + (p[0] - cx) * 0.93, cy + (p[1] - cy) * 0.93) for p in pts]
-    d.polygon(pts2, fill=fill)
-    fs = int(r * 0.34)
-    f = font(F_MARK, fs)
-    tot = len(lines) * fs * 1.02
-    y = cy - tot / 2
-    for l in lines:
-        d.text((cx - d.textlength(l, font=f) / 2, y - f.getbbox("H")[1] * 0.6), l,
-               font=f, fill=ink)
-        y += fs * 1.02
-
-
-def wordmark(img, x, y, size, blob=True):
-    """GREGO'S bubbly: letras creme com contorno vermelho sobre blob vermelho."""
-    d = ImageDraw.Draw(img, "RGBA")
+def wordmark_blob(base, x, y, size, angle=-2.5):
+    """GREGO'S bubbly no blob vermelho, levemente torto."""
     f = font(F_MARK, size)
-    t = "GREGO'S"
-    tw_ = d.textlength(t, font=f)
-    if blob:
-        pad_x, pad_y = size * 0.36, size * 0.24
-        d.rounded_rectangle([x - pad_x - 7, y - pad_y - 7, x + tw_ + pad_x + 7, y + size * 1.06 + pad_y + 7],
-                            radius=int(size * 0.72), fill=CREAM)
-        d.rounded_rectangle([x - pad_x, y - pad_y, x + tw_ + pad_x, y + size * 1.06 + pad_y],
-                            radius=int(size * 0.66), fill=RED)
-        d.text((x, y), t, font=f, fill=CREAM, stroke_width=max(2, int(size * 0.045)),
-               stroke_fill=RED_DK)
-    else:
-        d.text((x, y), t, font=f, fill=CREAM)
-    return tw_
+    tmp = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    wpx = tmp.textlength("GREGO'S", font=f)
+    px, py = size * 0.36, size * 0.24
+    lay = Image.new("RGBA", (int(wpx + px * 2 + 22), int(size * 1.06 + py * 2 + 22)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    d.rounded_rectangle([0, 0, lay.width - 1, lay.height - 1],
+                        radius=int(size * 0.72), fill=CREAM)
+    d.rounded_rectangle([11, 11, lay.width - 12, lay.height - 12],
+                        radius=int(size * 0.66), fill=RED)
+    d.text((11 + px, 11 + py), "GREGO'S", font=f, fill=CREAM,
+           stroke_width=max(2, int(size * 0.045)), stroke_fill=RED_DK)
+    paste_rot(base, lay, (x + lay.width / 2, y + lay.height / 2), angle)
 
 
-def footer(img, cta=True):
-    """Rodape: faixa xadrez + wordmark + CTA/praças."""
-    d = ImageDraw.Draw(img, "RGBA")
-    bar = 150
-    y0 = H - bar
+def footer(base, offset=0):
+    d = ImageDraw.Draw(base, "RGBA")
+    y0 = H - 150
     d.rectangle([0, y0, W, H], fill=WINE_LO)
-    checker(d, H - 34, h=34, cell=45)
-    f1 = font(F_UI, 27)
-    f2 = font(F_UIM, 20)
-    tracked(d, (M, y0 + 30), "PEÇA PELO LINK DA BIO", f1, CREAM, tk=1.3)
+    checker(d, H - 30, h=30, cell=45, offset=offset)
+    tracked(d, (M, y0 + 30), "PEÇA PELO LINK DA BIO", font(F_UI, 27), CREAM, tk=1.3)
     tracked(d, (M, y0 + 68), "CAMPO LIMPO PAULISTA · VÁRZEA PAULISTA · JUNDIAÍ",
-            f2, (246, 240, 225, 205), tk=0.8)
+            font(F_UIM, 20), (246, 240, 225, 205), tk=0.8)
     fm = font(F_MARK, 46)
-    d.text((W - M - d.textlength("GREGO'S", font=fm), y0 + 28), "GREGO'S", font=fm, fill=CREAM)
-
-
-def topmark(img):
-    wordmark(img, M + 6, M - 6, 46, blob=True)
+    d.text((W - M - d.textlength("GREGO'S", font=fm), y0 + 26), "GREGO'S", font=fm, fill=CREAM)
 
 
 # --------------------------------------------------------------- layouts
 def L_cartaz(c):
-    """Vinho + headline creme no topo + painel de foto — igual a referencia."""
     img = wine_bg().convert("RGBA")
     d = ImageDraw.Draw(img, "RGBA")
+    rng = random.Random(c["n"])
 
-    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 2 * M - 40, 300, 118, 60)
-    ytop = 150
+    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 2 * M - 40, 290, 116, 60)
+    ytop = 138
     put_lines(d, 0, ytop, hl, fh, CREAM, ha, center=W / 2)
+    yb = ytop + hh
 
-    fs = font(F_SUB, 34)
-    sl = wrap(d, c["sub"], fs, W - 2 * M - 250)
-    ysub = ytop + hh + 30
-    for l in sl:
-        d.text((W / 2 - d.textlength(l, font=fs) / 2, ysub), l, font=fs, fill=(246, 240, 225, 215))
-        ysub += 42
+    # traco de marcador sob a headline
+    lw = min(300, W * 0.34)
+    rough_line(d, W / 2 - lw / 2, yb + 26, W / 2 + lw / 2, rng=rng)
 
-    ptop = int(ysub + 40)
-    pbot = H - 150 - 44
-    ph = cover(FOTOS + c["foto"], W - 2 * M, pbot - ptop, *c.get("focus", (0.5, 0.5)), zoom=c.get("zoom", 1.0))
-    round_panel(img, ph, (M, ptop, W - M, pbot), radius=48, ring=9)
+    hand_note(img, W / 2 - 260, yb + 44, c["hand"], size=54, angle=c.get("hand_rot", -2.6))
 
-    star_badge(img, W - M - 34, ptop - 6, 104, c["badge"], rot=0.2)
-    footer(img)
-    return img.convert("RGB")
+    ptop = int(yb + 150)
+    pbot = H - 150 - 52
+    ph = cover(FOTOS + c["foto"], W - 2 * M - 26, pbot - ptop - 14,
+               *c.get("focus", (0.5, 0.5)), zoom=c.get("zoom", 1.0))
+    photo_card(img, ph, (W / 2, (ptop + pbot) / 2), angle=c.get("tilt", -1.5))
+    half_w = (W - 2 * M - 26) / 2 + 16
+    ctr_y = (ptop + pbot) / 2
+    half_h = (pbot - ptop - 14) / 2 + 16
+    tape(img, W / 2 - half_w + 26, ctr_y - half_h + 12, angle=-38)
+    tape(img, W / 2 + half_w - 26, ctr_y - half_h + 20, angle=34)
 
-
-def L_full(c):
-    """Foto sangrando + veu vinho + headline creme na base."""
-    img = cover(FOTOS + c["foto"], W, H, *c.get("focus", (0.5, 0.42)), zoom=c.get("zoom", 1.0)).convert("RGBA")
-    top = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    g = Image.new("L", (1, H))
-    gp = g.load()
-    for y in range(H):
-        t = y / (H - 1)
-        a = 235 * (max(0.0, t - 0.24) / 0.76) ** 1.3 + 120 * max(0.0, 1 - t / 0.30)
-        gp[0, y] = int(min(252, a))
-    top.putalpha(g.resize((W, H)))
-    top.paste(Image.new("RGB", (W, H), WINE_LO), (0, 0), top.split()[3])
-    img.alpha_composite(top)
-    d = ImageDraw.Draw(img, "RGBA")
-    if c.get("mark", True):
-        topmark(img)
-
-    base = H - 150 - 54
-    fs = font(F_SUB, 36)
-    sl = wrap(d, c["sub"], fs, W - 2 * M - 30)
-    sh = len(sl) * 44
-    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 2 * M, 380, 116, 58)
-    y = base - sh - 26 - hh
-    y = put_lines(d, M, y, hl, fh, CREAM, ha) + 26
-    d.rounded_rectangle([M, y - 4, M + 104, y + 6], radius=5, fill=RED)
-    for l in sl:
-        d.text((M, y + 24), l, font=fs, fill=(246, 240, 225, 232))
-        y += 44
-    star_badge(img, W - M - 26, 208, 100, c["badge"], rot=0.18)
+    sticker_star(img, W - M - 44, ptop + 22, 104, c["badge"], angle=c.get("badge_rot", -11))
     footer(img)
     return img.convert("RGB")
 
 
 def L_split(c):
-    """Painel de foto no topo + bloco vinho com headline."""
     img = wine_bg().convert("RGBA")
-    ph_h = 716
-    ph = cover(FOTOS + c["foto"], W, ph_h, *c.get("focus", (0.5, 0.5)), zoom=c.get("zoom", 1.0))
-    img.paste(ph, (0, 0))
+    rng = random.Random(c["n"])
+    ph_h = 700
+    img.paste(cover(FOTOS + c["foto"], W, ph_h, *c.get("focus", (0.5, 0.5)),
+                    zoom=c.get("zoom", 1.0)).convert("RGBA"), (0, 0))
     d = ImageDraw.Draw(img, "RGBA")
     checker(d, ph_h - 30, h=30, cell=45, offset=1)
     if c.get("mark", True):
-        topmark(img)
+        wordmark_blob(img, M, M - 12, 46)
 
-    fs = font(F_SUB, 36)
-    sl = wrap(d, c["sub"], fs, W - 2 * M)
-    top, bot = ph_h + 46, H - 150 - 40
-    room = (bot - top) - len(sl) * 44 - 46
-    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 2 * M, room, 116, 56)
-    total = hh + 22 + 24 + len(sl) * 44
+    fs = font(F_SUB, 35)
+    sl = wrap(d, c["sub"], fs, W - 2 * M - 40)
+    top, bot = ph_h + 52, H - 150 - 38
+    room = (bot - top) - len(sl) * 43 - 96
+    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 2 * M, room, 114, 56)
+    total = hh + 30 + 54 + len(sl) * 43
     y = top + max(0, ((bot - top) - total) / 2)
-    y = put_lines(d, M, y, hl, fh, CREAM, ha) + 22
-    d.rounded_rectangle([M, y - 4, M + 104, y + 6], radius=5, fill=RED)
+    y = put_lines(d, M, y, hl, fh, CREAM, ha)
+    rough_line(d, M, y + 28, M + 232, rng=rng)
+    y += 56
     for l in sl:
-        d.text((M, y + 24), l, font=fs, fill=(246, 240, 225, 225))
-        y += 44
-    star_badge(img, W - M - 30, ph_h - 74, 100, c["badge"], rot=0.18)
+        d.text((M, y), l, font=fs, fill=(246, 240, 225, 228))
+        y += 43
+    hand_note(img, M - 10, ph_h - 122, c["hand"], size=52,
+              angle=c.get("hand_rot", -4))
+    sticker_star(img, W - M - 40, ph_h - 108, 100, c["badge"], angle=c.get("badge_rot", 9))
+    footer(img, offset=1)
+    return img.convert("RGB")
+
+
+def L_full(c):
+    img = cover(FOTOS + c["foto"], W, H, *c.get("focus", (0.5, 0.42)),
+                zoom=c.get("zoom", 1.0)).convert("RGBA")
+    rng = random.Random(c["n"])
+    veil = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    g = Image.new("L", (1, H)); gp = g.load()
+    for y in range(H):
+        t = y / (H - 1)
+        gp[0, y] = int(min(252, 236 * (max(0.0, t - 0.24) / 0.76) ** 1.3
+                           + 120 * max(0.0, 1 - t / 0.30)))
+    veil.putalpha(g.resize((W, H)))
+    veil.paste(Image.new("RGB", (W, H), WINE_LO), (0, 0), veil.split()[3])
+    img.alpha_composite(veil)
+    d = ImageDraw.Draw(img, "RGBA")
+    if c.get("mark", True):
+        wordmark_blob(img, M, M - 12, 46)
+
+    base = H - 150 - 56
+    fs = font(F_SUB, 35)
+    sl = wrap(d, c["sub"], fs, W - 2 * M - 30)
+    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 2 * M, 350, 114, 58)
+    y = base - len(sl) * 43 - 56 - hh
+    hand_note(img, M - 6, y - 92, c["hand"], size=52, angle=c.get("hand_rot", -4))
+    y = put_lines(d, M, y, hl, fh, CREAM, ha)
+    rough_line(d, M, y + 28, M + 232, rng=rng)
+    y += 56
+    for l in sl:
+        d.text((M, y), l, font=fs, fill=(246, 240, 225, 234))
+        y += 43
+    sticker_star(img, W - M - 44, 268, 100, c["badge"], angle=c.get("badge_rot", -8))
     footer(img)
     return img.convert("RGB")
 
 
-LAY = {"cartaz": L_cartaz, "full": L_full, "split": L_split}
+LAY = {"cartaz": L_cartaz, "split": L_split, "full": L_full}
 
 PECAS = [
-    dict(n="01_grego_classico", lay="cartaz", foto="037_sirio.jpg", focus=(0.40, 0.52), zoom=1.45,
-         badge=["O", "CLÁSSICO"], head="O GREGO DA CASA",
+    dict(n="01_grego_de_sempre", lay="cartaz", foto="037_sirio.jpg",
+         focus=(0.40, 0.52), zoom=1.45, tilt=-1.6, badge=["O", "CLÁSSICO"],
+         head="O GREGO DE SEMPRE", hand="o que todo mundo pede",
          sub="Carne no espeto, vinagrete e queijo maçaricado no pão crocante."),
-    dict(n="02_gregao_queijo", lay="split", foto="foto gregos 16.jpg", focus=(0.46, 0.54), zoom=1.15,
-         badge=["O", "GREGÃO"], head="QUEIJO ATÉ A BORDA",
+
+    dict(n="02_gregao_queijo", lay="split", foto="foto gregos 16.jpg",
+         focus=(0.46, 0.54), zoom=1.15, badge=["O", "GREGÃO"],
+         head="QUEIJO ATÉ A BORDA", hand="sem economia",
          sub="O maior da casa, maçaricado de ponta a ponta."),
-    dict(n="03_macarico", lay="full", foto="foto gregos 06.jpg", focus=(0.50, 0.44),
-         badge=["FEITO", "NA HORA"], head="MAÇARICADO NA SUA FRENTE",
-         sub="O queijo derrete na hora do pedido. Sem atalho, sem vitrine."),
-    dict(n="04_espeto", lay="split", foto="foto gregos 04.jpg", focus=(0.56, 0.48),
-         badge=["BASTI-", "DORES"], head="CORTADO DIRETO DO ESPETO",
+
+    dict(n="03_macarico", lay="full", foto="foto gregos 06.jpg",
+         focus=(0.50, 0.44), badge=["NA", "HORA"],
+         head="A GENTE MAÇARICA NA SUA FRENTE", hand="dá pra ouvir o chiado",
+         sub="O queijo derrete na hora do pedido. Sem vitrine, sem atalho."),
+
+    dict(n="04_espeto", lay="split", foto="foto gregos 04.jpg",
+         focus=(0.56, 0.48), badge=["BASTI-", "DORES"],
+         head="CORTADO NA HORA, DO ESPETO", hand="nada parado esperando",
          sub="Churrasco grego de verdade, fatiado só quando você pede."),
-    dict(n="05_combo", lay="cartaz", foto="039_sirio.jpg", focus=(0.50, 0.50), zoom=1.28,
-         badge=["COMBO", "COMPLETO"], head="O COMBO QUE RESOLVE",
-         sub="Grego + batata + bebida. Fome resolvida sem pensar muito."),
-    dict(n="06_mesa_farta", lay="cartaz", foto="059_mesa-completa-frontal.jpg", focus=(0.50, 0.44), zoom=1.12,
-         badge=["PRA", "GALERA"], head="PEDIU, CHEGOU",
+
+    dict(n="05_combo", lay="cartaz", foto="039_sirio.jpg",
+         focus=(0.50, 0.50), zoom=1.28, tilt=1.4, badge=["COMBO"],
+         head="RESOLVE A NOITE INTEIRA", hand="grego + batata + gelada",
+         sub="Um pedido só e ninguém passa fome."),
+
+    dict(n="06_mesa_farta", lay="cartaz", foto="059_mesa-completa-frontal.jpg",
+         focus=(0.50, 0.44), zoom=1.12, tilt=-1.2, badge=["PRA", "DIVIDIR"],
+         head="PEDIU, CHEGOU", hand="chama a galera",
          sub="Mesa farta pra dividir com todo mundo. Ou não dividir nada."),
-    dict(n="07_primeira_mordida", lay="full", foto="108_modelo-sirio.jpg", focus=(0.50, 0.28),
-         badge=["EXPERI-", "MENTA"], head="A PRIMEIRA MORDIDA EXPLICA",
+
+    dict(n="07_primeira_mordida", lay="full", foto="foto gregos 29.jpg",
+         focus=(0.46, 0.16), zoom=1.02, badge=["EXPERI-", "MENTA"],
+         head="A PRIMEIRA MORDIDA EXPLICA", hand="depois a gente conversa",
          sub="Difícil de descrever. Muito fácil de repetir."),
-    dict(n="08_toda_noite_enche", lay="split", foto="foto gregos 18.jpg", focus=(0.47, 0.62), mark=False,
-         badge=["CAMPO", "LIMPO"], head="TODA NOITE ENCHE",
-         sub="E não é por acaso. Vem entender o motivo pessoalmente."),
-    dict(n="09_nossa_casa", lay="split", foto="foto gregos 09.jpg", focus=(0.50, 0.50),
-         badge=["NOSSA", "CASA"], head="LUGAR PRA SENTAR E COMER BEM",
-         sub="Salão novo, climatizado e com espaço pra família inteira."),
-    dict(n="10_montagem", lay="cartaz", foto="foto gregos 05.jpg", focus=(0.44, 0.52), zoom=1.20,
-         badge=["MON-", "TAGEM"], head="VINAGRETE POR CIMA, CARNE POR DENTRO",
-         sub="A montagem que fez a fama do Grego's na região."),
+
+    dict(n="08_toda_noite_enche", lay="split", foto="foto gregos 18.jpg",
+         focus=(0.47, 0.62), mark=False, badge=["CAMPO", "LIMPO"],
+         head="TODA NOITE ENCHE", hand="e não é por acaso",
+         sub="Passa aqui num sábado e me diz se tem mesa vazia."),
+
+    dict(n="09_cabe_todo_mundo", lay="split", foto="foto gregos 13.jpg",
+         focus=(0.50, 0.46), zoom=1.10, badge=["NOSSA", "CASA"],
+         head="AQUI CABE TODO MUNDO", hand="traz a família inteira",
+         sub="Salão novo, climatizado e com espaço pra sentar sem pressa."),
+
+    dict(n="10_montagem", lay="cartaz", foto="foto gregos 05.jpg",
+         focus=(0.44, 0.52), zoom=1.20, tilt=1.7, badge=["MON-", "TAGEM"],
+         head="O SEGREDO TÁ NA MONTAGEM", hand="camada por camada",
+         sub="Pão aberto, carne fatiada na hora e vinagrete por cima."),
 ]
 
 if __name__ == "__main__":

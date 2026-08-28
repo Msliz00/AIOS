@@ -16,18 +16,32 @@ Calcado na peça de referência da marca ("4 NOVOS GREGO'S"):
 | Creme | `#F6F0E1` | toda a tipografia |
 
 Elementos de assinatura: fundo vinho radial, wordmark bubbly sobre blob
-vermelho, selo estrela de 12 pontas, faixa xadrez e painel de foto com
+vermelho, selo estrela de 12 pontas, faixa xadrez e card de foto com
 cantos arredondados.
 
 Tipografia: Nunito 900 (headline), Chewy (wordmark/selo), Baloo 2 700
-(apoio), Inter (CTA).
+(apoio), Caveat 700 (manuscrito), Inter (CTA).
+
+## Camada humanizada
+
+O que impede o conjunto de parecer template:
+
+- recado manuscrito em cada peça, escrito torto;
+- traço de marcador sob a headline — três passadas com tremido e ponta
+  que escapa, em vez de uma barra reta;
+- selo estrela colado torto (-11° a +9°), como adesivo;
+- card de foto girado 1 a 2 graus, preso por fita adesiva translúcida
+  nos cantos.
+
+Nenhum eixo fica perfeitamente alinhado, de propósito. As peças 07 e 09
+usam clientes reais da loja no lugar do modelo de estúdio.
 
 > O wordmark é reconstrução tipográfica — o arquivo oficial do logo não
 > estava disponível. Substituir por `logo_oficial.png` quando houver.
 
 ## Layouts
 
-- `cartaz` — vinho + headline centralizada no topo + painel de foto
+- `cartaz` — vinho + headline centralizada no topo + card de foto com fita
 - `split` — foto no topo + faixa xadrez + bloco vinho com headline
 - `full` — foto sangrando + véu vinho + headline na base
 
@@ -35,10 +49,11 @@ Tipografia: Nunito 900 (headline), Chewy (wordmark/selo), Baloo 2 700
 
 ```bash
 pip install pillow
-python3 build_artes.py       # escreve em artes2/
+python3 build_artes.py       # escreve em artes3/
 ```
 
 As fotos de origem ficam em `fotos/` e as fontes em `fonts/` (Google
 Fonts). Para trocar headline, foto, selo ou recorte, edite a lista
 `PECAS` no fim do script — cada peça aceita `foto`, `focus`, `zoom`,
-`badge`, `head`, `sub`, `lay` e `mark`.
+`tilt`, `badge`, `badge_rot`, `head`, `hand`, `hand_rot`, `sub`, `lay`
+e `mark`.
