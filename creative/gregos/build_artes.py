@@ -23,7 +23,7 @@ WHITE  = (255, 255, 255)
 RED    = (232, 35, 42)
 MUTED  = (150, 143, 130)
 
-F_HEAD = FONTS + "Nunito900.ttf"
+F_HEAD = FONTS + "Poppins700.ttf"
 F_MARK = FONTS + "Chewy.ttf"
 F_UI   = FONTS + "Inter700.ttf"
 F_UIM  = FONTS + "Inter500.ttf"
@@ -77,7 +77,8 @@ def put_centered(d, ytop, lines, f, fill, adv):
     for l in lines:
         d.text((W / 2 - d.textlength(l, font=f) / 2, y - top), l, font=f, fill=fill)
         y += adv
-    return y - adv + (f.getbbox("Ah")[3] - top)
+    # base real da ultima linha, contando descendentes (g, p, q, j)
+    return y - adv + (max(f.getbbox(lines[-1])[3], f.getbbox("Ah")[3]) - top)
 
 
 def tracked_center(d, y, t, f, fill, tk):
@@ -102,7 +103,7 @@ def cover(path, bw, bh, fx=0.5, fy=0.5, zoom=1.0):
     return im.filter(ImageFilter.UnsharpMask(radius=2, percent=58, threshold=3))
 
 
-def photo_top(base, path, band_h, focus, zoom, fade=210):
+def photo_top(base, path, band_h, focus, zoom, fade=170):
     """Foto sangrando no topo, dissolvendo no preto — como na referência."""
     ph = cover(FOTOS + path, W, band_h, *focus, zoom=zoom).convert("RGBA")
     a = Image.new("L", (W, band_h), 255)
@@ -183,66 +184,66 @@ def build(c):
     if c.get("mark", True):
         wordmark(d, 54)
 
-    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 190, 300, 94, 52)
-    fs = font(F_UIM, 30)
-    sl = wrap(d, c["sub"], fs, W - 260) if c.get("sub") else []
+    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 150, 250, 88, 50, extra=0.14)
+    fs = font(F_UIM, 29)
+    sl = wrap(d, c["sub"], fs, W - 230) if c.get("sub") else []
 
-    bloco = hh + (26 + len(sl) * 38 if sl else 0) + 96 + 43
-    topo, base_y = band - 66, H - 148
+    bloco = hh + (30 + len(sl) * 36 if sl else 0) + 84 + 43
+    topo, base_y = band - 40, H - 130
     ytop = topo + max(0, ((base_y - topo) - bloco) / 2)
 
     yb = put_centered(d, ytop, hl, fh, CREAM, ha)
     for l in sl:
-        d.text((W / 2 - d.textlength(l, font=fs) / 2, yb + 26), l, font=fs, fill=MUTED)
-        yb += 38
+        d.text((W / 2 - d.textlength(l, font=fs) / 2, yb + 30), l, font=fs, fill=MUTED)
+        yb += 36
 
-    cta_pill(img, yb + 96, c.get("cta", "PEÇA AGORA!"))
+    cta_pill(img, yb + 84, c.get("cta", "PEÇA AGORA!"))
 
     f2 = font(F_UIM, 21)
-    tracked_center(d, H - 82, "CAMPO LIMPO PAULISTA · VÁRZEA PAULISTA · JUNDIAÍ",
+    tracked_center(d, H - 72, "CAMPO LIMPO PAULISTA · VÁRZEA PAULISTA · JUNDIAÍ",
                    f2, (150, 143, 130), 1.1)
     return img.convert("RGB")
 
 
 PECAS = [
-    dict(n="01_grego_de_sempre", foto="037_sirio.jpg", focus=(0.40, 0.52), zoom=1.45,
-         band=790, head="O grego de sempre.",
+    dict(n="01_grego_de_sempre", foto="037_sirio.jpg", focus=(0.40, 0.54), zoom=1.75,
+         band=930, head="O grego de sempre.",
          sub="Carne no espeto, vinagrete e queijo maçaricado."),
 
-    dict(n="02_gregao_queijo", foto="foto gregos 16.jpg", focus=(0.46, 0.54), zoom=1.15,
-         band=800, head="Queijo até a borda.",
+    dict(n="02_gregao_queijo", foto="foto gregos 16.jpg", focus=(0.46, 0.55), zoom=1.42,
+         band=930, head="Queijo até a borda.",
          sub="O Gregão vem maçaricado de ponta a ponta."),
 
-    dict(n="03_macarico", foto="foto gregos 06.jpg", focus=(0.50, 0.46), zoom=1.05,
-         band=810, head="Maçaricado na sua frente.",
+    dict(n="03_macarico", foto="foto gregos 06.jpg", focus=(0.50, 0.47), zoom=1.28,
+         band=930, head="Maçaricado na sua frente.",
          sub="O queijo derrete na hora do pedido."),
 
-    dict(n="04_espeto", foto="foto gregos 04.jpg", focus=(0.56, 0.48), zoom=1.05,
-         band=800, head="Cortado na hora, do espeto.",
+    dict(n="04_espeto", foto="foto gregos 04.jpg", focus=(0.56, 0.48), zoom=1.22,
+         band=930, head="Cortado na hora, do espeto.",
          sub="Churrasco grego de verdade, fatiado só quando você pede."),
 
-    dict(n="05_combo", foto="039_sirio.jpg", focus=(0.50, 0.50), zoom=1.28,
-         band=790, head="Resolve a noite inteira.",
+    dict(n="05_combo", foto="039_sirio.jpg", focus=(0.50, 0.52), zoom=1.55,
+         band=930, head="Resolve a noite inteira.",
          sub="Grego + batata + bebida gelada."),
 
-    dict(n="06_mesa_farta", foto="059_mesa-completa-frontal.jpg", focus=(0.50, 0.44), zoom=1.10,
-         band=820, head="Hoje pede Grego's.",
+    dict(n="06_mesa_farta", foto="059_mesa-completa-frontal.jpg", focus=(0.50, 0.46), zoom=1.22,
+         band=940, head="Hoje pede Grego's.",
          sub="Mesa farta pra dividir com todo mundo."),
 
-    dict(n="07_primeira_mordida", foto="foto gregos 29.jpg", focus=(0.46, 0.16), zoom=1.02,
-         band=800, head="A primeira mordida explica.",
+    dict(n="07_primeira_mordida", foto="foto gregos 29.jpg", focus=(0.46, 0.20), zoom=1.18,
+         band=930, head="A primeira mordida explica.",
          sub="Difícil de descrever. Fácil de repetir."),
 
-    dict(n="08_toda_noite_enche", foto="foto gregos 18.jpg", focus=(0.47, 0.62), zoom=1.02, mark=False,
-         band=800, head="Toda noite enche.",
+    dict(n="08_toda_noite_enche", foto="foto gregos 18.jpg", focus=(0.47, 0.62), zoom=1.14, mark=False,
+         band=930, head="Toda noite enche.",
          sub="E não é por acaso. Vem entender o motivo."),
 
-    dict(n="09_cabe_todo_mundo", foto="foto gregos 13.jpg", focus=(0.50, 0.46), zoom=1.10,
-         band=800, head="Aqui cabe todo mundo.",
+    dict(n="09_cabe_todo_mundo", foto="foto gregos 13.jpg", focus=(0.50, 0.47), zoom=1.32,
+         band=930, head="Aqui cabe todo mundo.",
          sub="Salão novo, com espaço pra sentar sem pressa."),
 
-    dict(n="10_montagem", foto="foto gregos 05.jpg", focus=(0.44, 0.52), zoom=1.20,
-         band=800, head="O segredo tá na montagem.",
+    dict(n="10_montagem", foto="foto gregos 05.jpg", focus=(0.44, 0.53), zoom=1.45,
+         band=930, head="O segredo tá na montagem.",
          sub="Pão aberto, carne fatiada na hora e vinagrete por cima."),
 ]
 

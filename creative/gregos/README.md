@@ -8,8 +8,9 @@ Gera as 10 mídias 1080x1350 da campanha de captação da Grego's
 Calcado no story de referência do próprio perfil, "Hoje pede Grego's.".
 Estrutura igual nas 10 peças:
 
-1. foto sangrando no topo (~59% da altura), dissolvendo num fade de
-   210px até o preto — sem moldura, sem card;
+1. foto sangrando no topo (~70% da altura), dissolvendo num fade de
+   170px até o preto — sem moldura, sem card. O produto é enquadrado
+   fechado, via `zoom`, pra preencher o quadro;
 2. wordmark `GREGO'S` pequeno e centralizado sobre a foto, com `®`;
 3. headline creme, centralizada, em **caixa baixa** e terminada em
    **ponto final** — é a assinatura de voz da marca;
@@ -25,8 +26,11 @@ Estrutura igual nas 10 peças:
 | Branco | `#FFFFFF` | pílula de CTA |
 | Vermelho Grego's | `#E8232A` | texto e ícone da pílula |
 
-Tipografia: Nunito 900 (headline), Chewy (wordmark), Inter 500/700
+Tipografia: Poppins 700 (headline), Chewy (wordmark), Inter 500/700
 (sub e CTA).
+
+A headline é geométrica, não arredondada: é o desenho da peça de
+referência. Fontes tipo Nunito deixam o conjunto com cara de infantil.
 
 > O wordmark é reconstrução tipográfica — o arquivo oficial do logo não
 > estava disponível. Substituir quando houver.
