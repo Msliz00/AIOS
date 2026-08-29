@@ -66,9 +66,11 @@ def recolor(path_in, path_out):
         silhueta = silhueta.filter(ImageFilter.MaxFilter(9))
     for _ in range(5):
         silhueta = silhueta.filter(ImageFilter.MinFilter(9))
-    silhueta = silhueta.filter(ImageFilter.GaussianBlur(6))
+    silhueta = silhueta.filter(ImageFilter.GaussianBlur(3))
     protegido = np.asarray(silhueta, dtype=np.float32) / 255.0
-    peso = (peso * (1.0 - protegido))[..., None]
+    peso = peso * (1.0 - protegido)
+    peso[peso < 0.02] = 0.0          # pixel do produto sai idêntico ao original
+    peso = peso[..., None]
 
     g = gradiente(w, h)
     # mistura direta, não screen: screen vazava luz vermelha para dentro do produto
@@ -76,7 +78,7 @@ def recolor(path_in, path_out):
 
     os.makedirs(os.path.dirname(path_out), exist_ok=True)
     Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(
-        path_out, quality=93, subsampling=0, optimize=True)
+        path_out, quality=99, subsampling=0, optimize=True)
 
 
 if __name__ == "__main__":

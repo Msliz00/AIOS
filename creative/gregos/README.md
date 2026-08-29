@@ -89,3 +89,24 @@ python3 recolor_vermelho.py caminho/arte.jpg   # ou peças específicas
 `LIMIAR` e `CURVA` no topo do arquivo controlam quanto da arte é tratada
 como fundo. Limiar alto demais tinge o produto; baixo demais deixa o
 fundo sujo.
+
+### Qualidade de saída
+
+As artes de entrada já são JPEG de segunda mão (tabela de quantização
+equivalente a q≈88), então **salvar a saída em qualidade média cobra uma
+segunda geração de perda**. Medindo a variância do laplaciano numa peça:
+
+| | nitidez | PSNR vs entrada |
+|---|---|---|
+| entrada | 296,1 | — |
+| re-salva em q93, **sem alterar nada** | 276,2 | 48,9 dB |
+| re-salva em q99 | 297,1 | 53,8 dB |
+
+Ou seja: a perda não vem do recolor, vem do `save`. Por isso o script
+grava em **q99 com subsampling 4:4:4**, o que devolve 99–100% da nitidez
+da entrada. Não baixe esse valor para economizar espaço.
+
+Dois detalhes ajudam no mesmo sentido: o blur da máscara é curto (3px,
+não 6) para não borrar o contorno do produto, e pesos residuais abaixo
+de 0,02 são zerados, de modo que o pixel do produto sai idêntico ao
+original em vez de passar por uma mistura inútil.
