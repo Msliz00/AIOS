@@ -1,27 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-GREGO'S — feed Instagram 1080x1350.
+GREGO'S — feed Instagram 1080x1350, fundo vermelho.
 
-Padrao da peca de referencia do proprio perfil ("Hoje pede Grego's."):
-fundo preto, foto sangrando no topo com fade, wordmark pequeno e
-centralizado, headline creme em caixa baixa terminada em ponto, e
-botao-pilula branco de CTA. Sem adesivo, sem manuscrito, sem xadrez.
+Mesma estrutura da peca de referencia do perfil ("Hoje pede Grego's."),
+com o preto trocado pelo degrade vermelho da marca.
+
+A foto nao e recortada do fundo. Em vez disso as sombras dela sao
+tingidas com o vinho da marca (split-tone), entao a imagem se integra ao
+degrade como se tivesse sido iluminada assim. E o que evita o halo e a
+mancha de um recorte por mascara.
 """
 import os, math
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
 S = "/tmp/claude-0/-home-user-AIOS/6f054a58-1907-5469-9055-58632a643f99/scratchpad"
-FOTOS, FONTS, OUT = S + "/fotos/", S + "/fonts/", S + "/artes4/"
+FOTOS, FONTS, OUT = S + "/fotos/", S + "/fonts/", S + "/artes5/"
 os.makedirs(OUT, exist_ok=True)
 
 W, H = 1080, 1350
 
-BLACK  = (13, 13, 13)
-CREAM  = (242, 236, 221)
-WHITE  = (255, 255, 255)
-RED    = (232, 35, 42)
-MUTED  = (150, 143, 130)
+RED_HOT  = (226, 28, 15)      # vermelho vivo da marca
+RED_MID  = (150, 20, 30)
+RED_DEEP = (74, 9, 15)        # vinho das bordas e das sombras
+CREAM    = (245, 239, 226)
+RED_INK  = (206, 26, 22)      # texto dentro da pilula creme
 
 F_HEAD = FONTS + "Poppins700.ttf"
 F_MARK = FONTS + "Chewy.ttf"
@@ -103,105 +107,108 @@ def cover(path, bw, bh, fx=0.5, fy=0.5, zoom=1.0):
     return im.filter(ImageFilter.UnsharpMask(radius=2, percent=58, threshold=3))
 
 
-def photo_top(base, path, band_h, focus, zoom, fade=170):
-    """Foto sangrando no topo, dissolvendo no preto — como na referência."""
-    ph = cover(FOTOS + path, W, band_h, *focus, zoom=zoom).convert("RGBA")
-    a = Image.new("L", (W, band_h), 255)
-    ad = a.load()
+def fundo_vermelho():
+    """Degradê radial: vermelho vivo no centro-alto, vinho nas bordas."""
+    cx, cy = W * 0.5, H * 0.30
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    dmax = max(math.hypot(cx, cy), math.hypot(W - cx, cy),
+               math.hypot(cx, H - cy), math.hypot(W - cx, H - cy))
+    t = np.clip(np.hypot(xx - cx, yy - cy) / dmax, 0, 1) ** 1.10
+    hot = np.array(RED_HOT, np.float32); mid = np.array(RED_MID, np.float32)
+    deep = np.array(RED_DEEP, np.float32)
+    meio = 0.44
+    a = np.clip(t / meio, 0, 1)[..., None]
+    b = np.clip((t - meio) / (1 - meio), 0, 1)[..., None]
+    g = np.where(t[..., None] <= meio, hot + (mid - hot) * a, mid + (deep - mid) * b)
+    return Image.fromarray(g.astype(np.uint8), "RGB")
+
+
+def split_tone(im, expo=3.2):
+    """Tinge as sombras da foto com o vinho da marca, preservando as altas-luzes.
+
+    Sem máscara e sem limiar: a transição é contínua, então não há halo em
+    volta do produto nem mancha na madeira — a foto inteira passa a viver
+    sob a mesma luz vermelha do fundo.
+
+    O expoente alto é o que salva o apetite: no preto puro o tingimento é
+    total (a foto funde com o degradê), mas num meio-tom de 0,4 de
+    luminância ele já cai para ~20%, então pão, queijo e carne seguem com
+    a cor e o brilho de comida.
+    """
+    im = ImageEnhance.Brightness(im).enhance(1.05)
+    a = np.asarray(im, np.float32)
+    lum = (0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]) / 255.0
+    sombra = ((1.0 - lum) ** expo)[..., None]
+    out = a + (np.array(RED_DEEP, np.float32) - a) * sombra
+    out = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGB")
+    return ImageEnhance.Color(out).enhance(1.06)
+
+
+def photo_top(base, path, band_h, focus, zoom, fade=150):
+    """Foto sangrando no topo, já tingida, dissolvendo no degradê."""
+    ph = split_tone(cover(FOTOS + path, W, band_h, *focus, zoom=zoom)).convert("RGBA")
+    m = Image.new("L", (W, band_h), 255)
+    md = m.load()
     for y in range(band_h - fade, band_h):
-        v = int(255 * (1 - (y - (band_h - fade)) / fade) ** 1.5)
+        v = int(255 * (1 - (y - (band_h - fade)) / fade) ** 1.4)
         for x in range(W):
-            ad[x, y] = v
-    # leve escurecida no topo, para o wordmark respirar
-    dark = Image.new("RGBA", (W, band_h), (0, 0, 0, 0))
-    g = Image.new("L", (1, band_h), 0); gp = g.load()
-    for y in range(band_h):
-        gp[0, y] = int(120 * max(0.0, 1 - y / 240) ** 1.4)
-    dark.putalpha(g.resize((W, band_h)))
-    dark.paste(Image.new("RGB", (W, band_h), (0, 0, 0)), (0, 0), dark.split()[3])
-    ph.alpha_composite(dark)
-    ph.putalpha(a)
+            md[x, y] = v
+    ph.putalpha(m)
     base.alpha_composite(ph, (0, 0))
 
 
 # ---------------------------------------------------------------- marca
-def wordmark(d, y, size=46):
+def wordmark(d, y, size=48):
     f = font(F_MARK, size)
     t = "GREGO'S"
-    x = W / 2 - d.textlength(t, font=f) / 2
-    d.text((x, y), t, font=f, fill=CREAM)
-    # registro ®, como na peca da marca
-    fr = font(F_UIM, int(size * 0.30))
-    d.text((x + d.textlength(t, font=f) + 8, y + size * 0.18), "®", font=fr, fill=CREAM)
+    d.text((W / 2 - d.textlength(t, font=f) / 2, y), t, font=f, fill=CREAM)
 
 
-def link_icon(base, cx, cy, s, color):
-    """Icone de corrente (dois elos na diagonal), desenhado em camada propria."""
-    S4 = 4                                   # supersampling, pra borda limpa
-    box = int(s * 2.0) * S4
-    lay = Image.new("RGBA", (box, box), (0, 0, 0, 0))
-    dl = ImageDraw.Draw(lay)
-    w = max(2, int(s * 0.105)) * S4
-    elo_w, elo_h = s * 0.70 * S4, s * 0.34 * S4
-    shift = elo_w * 0.58                     # elos colineares que se cruzam
-    c = box / 2
-    for sign in (-1, 1):
-        x0 = c + sign * shift / 2 - elo_w / 2
-        y0 = c - elo_h / 2
-        dl.rounded_rectangle([x0, y0, x0 + elo_w, y0 + elo_h],
-                             radius=elo_h / 2, outline=color + (255,), width=w)
-    lay = lay.rotate(-45, resample=Image.BICUBIC)
-    lay = lay.resize((int(box / S4), int(box / S4)), Image.LANCZOS)
-    base.alpha_composite(lay, (int(cx - lay.width / 2), int(cy - lay.height / 2)))
-
-
-def cta_pill(base, cy, label="PEÇA AGORA!"):
-    """Pílula branca de CTA — mesma forma da referência, cor da marca."""
+def cta_pill(base, cy, label="PEÇA PELO LINK DA BIO"):
+    """Pílula creme, só tipografia. Nada de ícone desenhado nem UI falsa."""
     d = ImageDraw.Draw(base, "RGBA")
-    f = font(F_UI, 33)
-    tk = 1.6
+    f = font(F_UI, 29)
+    tk = 2.1
     tw = d.textlength(label, font=f) + tk * (len(label) - 1)
-    icon = 52
-    inner = icon + 20 + tw
-    pad_x, ph = 46, 86
-    pw = inner + pad_x * 2
-    x0, y0 = W / 2 - pw / 2, cy - ph / 2
-    d.rounded_rectangle([x0, y0, x0 + pw, y0 + ph], radius=ph / 2, fill=WHITE)
-    link_icon(base, x0 + pad_x + icon / 2, cy, icon, RED)
-    x = x0 + pad_x + icon + 20
+    pad_x, ph = 52, 80
+    pw = tw + pad_x * 2
+    x0 = W / 2 - pw / 2
+    d.rounded_rectangle([x0, cy - ph / 2, x0 + pw, cy + ph / 2],
+                        radius=ph / 2, fill=CREAM)
+    x = x0 + pad_x
     for ch in label:
-        d.text((x, cy - 22), ch, font=f, fill=RED)
+        d.text((x, cy - 19), ch, font=f, fill=RED_INK)
         x += d.textlength(ch, font=f) + tk
 
 
 # --------------------------------------------------------------- montagem
 def build(c):
-    img = Image.new("RGBA", (W, H), BLACK + (255,))
+    img = fundo_vermelho().convert("RGBA")
     band = c.get("band", 800)
     photo_top(img, c["foto"], band, c.get("focus", (0.5, 0.5)), c.get("zoom", 1.0))
     d = ImageDraw.Draw(img, "RGBA")
 
     if c.get("mark", True):
-        wordmark(d, 54)
+        wordmark(d, 52)
 
-    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 150, 250, 88, 50, extra=0.14)
+    fh, hl, hs, ha, hh = fit(d, c["head"], F_HEAD, W - 150, 250, 86, 50, extra=0.14)
     fs = font(F_UIM, 29)
-    sl = wrap(d, c["sub"], fs, W - 230) if c.get("sub") else []
+    sl = wrap(d, c["sub"], fs, W - 250) if c.get("sub") else []
 
-    bloco = hh + (30 + len(sl) * 36 if sl else 0) + 84 + 43
-    topo, base_y = band - 40, H - 130
+    bloco = hh + (34 + len(sl) * 37 if sl else 0) + 92 + 40
+    topo, base_y = band - 24, H - 132
     ytop = topo + max(0, ((base_y - topo) - bloco) / 2)
 
     yb = put_centered(d, ytop, hl, fh, CREAM, ha)
     for l in sl:
-        d.text((W / 2 - d.textlength(l, font=fs) / 2, yb + 30), l, font=fs, fill=MUTED)
-        yb += 36
+        d.text((W / 2 - d.textlength(l, font=fs) / 2, yb + 34), l, font=fs,
+               fill=CREAM + (185,))
+        yb += 37
 
-    cta_pill(img, yb + 84, c.get("cta", "PEÇA AGORA!"))
+    cta_pill(img, yb + 92, c.get("cta", "PEÇA PELO LINK DA BIO"))
 
-    f2 = font(F_UIM, 21)
-    tracked_center(d, H - 72, "CAMPO LIMPO PAULISTA · VÁRZEA PAULISTA · JUNDIAÍ",
-                   f2, (150, 143, 130), 1.1)
+    tracked_center(d, H - 74, "CAMPO LIMPO PAULISTA · VÁRZEA PAULISTA · JUNDIAÍ",
+                   font(F_UIM, 20), CREAM + (150,), 1.5)
     return img.convert("RGB")
 
 

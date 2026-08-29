@@ -54,59 +54,26 @@ Fonts). Para trocar foto, headline, sub ou enquadramento, edite a lista
 `PECAS` no fim do script — cada peça aceita `foto`, `focus`, `zoom`,
 `band`, `head`, `sub`, `cta` e `mark`.
 
-## Recolor para degradê vermelho (`recolor_vermelho.py`)
+## Por que não recortar o produto do fundo
 
-Troca o fundo preto de um pacote de artes já finalizadas pelo degradê
-vermelho da marca, sem redesenhar nada por cima.
+A primeira tentativa de trocar o preto por vermelho usou máscara de
+luminância para separar produto e fundo. O resultado tinha halo em volta
+do produto, mancha vermelha invadindo a madeira e a sombra de apoio
+desaparecida — o produto ficava colado no fundo. Não use esse caminho.
 
-O fundo das peças e das fotos de estúdio é praticamente preto, então em
-vez de recortar o produto o script usa a luminância como máscara: onde a
-arte é escura entra o degradê, onde é clara (produto, tipografia,
-pílulas, preços) a arte original é preservada.
+O que funciona é **tingir as sombras da foto** com o vinho da marca
+(`split_tone`): sem máscara e sem limiar, a transição é contínua, então
+não há borda para errar. A foto passa a viver sob a mesma luz vermelha
+do degradê e funde nele naturalmente.
 
-Dois detalhes que fazem a diferença:
+O parâmetro que decide tudo é o expoente da curva:
 
-- **mistura direta, não `screen`** — o screen vazava luz vermelha para
-  dentro do produto e deixava o pão rosado;
-- **fechamento morfológico da silhueta** (dilate → erode → blur) — sem
-  ele, os vazios escuros *dentro* do produto (o recheio de carne, a
-  sombra entre os pães) também virariam vermelho vivo.
-
-Vermelhos tirados do próprio material da marca:
-
-| Hex | Papel |
-|---|---|
-| `#E21C0F` | vermelho vivo, centro do degradê |
-| `#8A1523` | vinho médio |
-| `#4E0A10` | vinho escuro, bordas |
-
-```bash
-pip install pillow numpy
-python3 recolor_vermelho.py                    # lê zipin/export/ads, escreve export/ads
-python3 recolor_vermelho.py caminho/arte.jpg   # ou peças específicas
+```python
+sombra = (1 - luminancia) ** 3.2
 ```
 
-`LIMIAR` e `CURVA` no topo do arquivo controlam quanto da arte é tratada
-como fundo. Limiar alto demais tinge o produto; baixo demais deixa o
-fundo sujo.
-
-### Qualidade de saída
-
-As artes de entrada já são JPEG de segunda mão (tabela de quantização
-equivalente a q≈88), então **salvar a saída em qualidade média cobra uma
-segunda geração de perda**. Medindo a variância do laplaciano numa peça:
-
-| | nitidez | PSNR vs entrada |
-|---|---|---|
-| entrada | 296,1 | — |
-| re-salva em q93, **sem alterar nada** | 276,2 | 48,9 dB |
-| re-salva em q99 | 297,1 | 53,8 dB |
-
-Ou seja: a perda não vem do recolor, vem do `save`. Por isso o script
-grava em **q99 com subsampling 4:4:4**, o que devolve 99–100% da nitidez
-da entrada. Não baixe esse valor para economizar espaço.
-
-Dois detalhes ajudam no mesmo sentido: o blur da máscara é curto (3px,
-não 6) para não borrar o contorno do produto, e pesos residuais abaixo
-de 0,02 são zerados, de modo que o pixel do produto sai idêntico ao
-original em vez de passar por uma mistura inútil.
+No preto puro o tingimento é total, e a foto se dissolve no fundo. Num
+meio-tom de 0,4 de luminância ele já cai para ~20%, então pão, queijo e
+carne mantêm cor e brilho de comida. Com expoente baixo (2,1) a imagem
+inteira escurece e o produto perde o apetite — que é o erro mais caro
+numa peça de food.
