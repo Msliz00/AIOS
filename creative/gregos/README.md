@@ -53,3 +53,39 @@ As fotos de origem ficam em `fotos/` e as fontes em `fonts/` (Google
 Fonts). Para trocar foto, headline, sub ou enquadramento, edite a lista
 `PECAS` no fim do script — cada peça aceita `foto`, `focus`, `zoom`,
 `band`, `head`, `sub`, `cta` e `mark`.
+
+## Recolor para degradê vermelho (`recolor_vermelho.py`)
+
+Troca o fundo preto de um pacote de artes já finalizadas pelo degradê
+vermelho da marca, sem redesenhar nada por cima.
+
+O fundo das peças e das fotos de estúdio é praticamente preto, então em
+vez de recortar o produto o script usa a luminância como máscara: onde a
+arte é escura entra o degradê, onde é clara (produto, tipografia,
+pílulas, preços) a arte original é preservada.
+
+Dois detalhes que fazem a diferença:
+
+- **mistura direta, não `screen`** — o screen vazava luz vermelha para
+  dentro do produto e deixava o pão rosado;
+- **fechamento morfológico da silhueta** (dilate → erode → blur) — sem
+  ele, os vazios escuros *dentro* do produto (o recheio de carne, a
+  sombra entre os pães) também virariam vermelho vivo.
+
+Vermelhos tirados do próprio material da marca:
+
+| Hex | Papel |
+|---|---|
+| `#E21C0F` | vermelho vivo, centro do degradê |
+| `#8A1523` | vinho médio |
+| `#4E0A10` | vinho escuro, bordas |
+
+```bash
+pip install pillow numpy
+python3 recolor_vermelho.py                    # lê zipin/export/ads, escreve export/ads
+python3 recolor_vermelho.py caminho/arte.jpg   # ou peças específicas
+```
+
+`LIMIAR` e `CURVA` no topo do arquivo controlam quanto da arte é tratada
+como fundo. Limiar alto demais tinge o produto; baixo demais deixa o
+fundo sujo.
