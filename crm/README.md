@@ -141,11 +141,76 @@ completo; `optin_*` só é `true` com `consent_marketing` e sem `opt_out`.
 Carga: `COPY` para staging, depois `promover_staging()`, que usa
 `ON CONFLICT DO NOTHING` — rodar duas vezes não duplica nem sobrescreve.
 
+## Captura nos grupos (fase 2)
+
+O `/start` no bot agora tem 4 caminhos, todos no MESMO fluxo n8n (Telegram só
+permite um webhook por bot):
+
+```
+Telegram /start → Extrair Payload (classifica) → Rotear Entrada
+   ├─ contato   → Capturar Contato (RPC capturar_contato) → confirma
+   ├─ grupo     → Capturar Grupo   (RPC capturar_start)   → Pedir Número (request_contact)
+   ├─ token     → Resolver Opt-in  (fluxo de lead, intacto)
+   └─ vazio     → "use o link que você recebeu"
+```
+
+Mecânica da captura:
+1. O lead clica no link do grupo `?start=g<n>` → `capturar_start` grava o
+   `telegram_id` na hora (mesmo antes do telefone) e responde com o botão
+   **📱 Confirmar meu número** (`request_contact` do Telegram).
+2. O lead toca no botão → o Telegram entrega o **telefone verificado**.
+3. `capturar_contato` faz o **merge inverso**: casa o `telegram_id` com o lead do
+   CRM que já tem aquele telefone. Recupera o grupo do último `/start` (o código
+   não vem na mensagem de contato).
+
+Só o próprio número é aceito: `request_contact` só compartilha o número do
+próprio usuário, e o fluxo ainda checa `contact.user_id == from.id`.
+
+### Estados de `capturar_contato`
+
+| status | quando |
+|---|---|
+| `fundido` | telefone bate com lead do CRM → funde o lead só-Telegram nele |
+| `telefone_add` | lead só-Telegram ganha o telefone |
+| `telegram_add` | lead do CRM (só telefone) ganha o telegram |
+| `novo` | nem telefone nem telegram existiam |
+| `ja_completo` | reenvio, já estava ligado |
+| `conflito_telegram` | o telefone já está ligado a outro telegram_id |
+| `telefone_invalido` | número não normaliza |
+
+Testado 9/9 cenários contra a base real; dados de teste removidos.
+
+### Tabelas e objetos novos
+
+- `telegram_grupos.codigo` — `g1`..`g8`, o payload do deep-link por grupo
+- `telegram_capturas` — log de cada `start`/`contato` (telemetria)
+- `capturar_start`, `capturar_contato` — service_role only
+- view `captura_grupos` — funil por grupo: clicaram, deram_telefone, fundidos_com_crm
+
+### Links de captura (um por grupo)
+
+Poste dentro de cada canal. Reutilizáveis por qualquer membro (não são consumíveis).
+
+| grupo | membros | link |
+|---|---:|---|
+| Mentoria Hacker Slot | 31.000 | `https://t.me/Ribasadm1_bot?start=g7` |
+| Analistas Wolf | 15.050 | `https://t.me/Ribasadm1_bot?start=g5` |
+| Mentoria Hacker Of Slot 🏆 | 14.000 | `https://t.me/Ribasadm1_bot?start=g8` |
+| HACKER SLOTS TITANIUN | 3.731 | `https://t.me/Ribasadm1_bot?start=g2` |
+| Mentoria Hacker Dados | 3.348 | `https://t.me/Ribasadm1_bot?start=g3` |
+| Mentoria Hacker Slots 3.0 🏆 | 2.613 | `https://t.me/Ribasadm1_bot?start=g1` |
+| Pererafany Slot | 2.278 | `https://t.me/Ribasadm1_bot?start=g4` |
+| Mentoria Hacker Of Slot | 1.000 | `https://t.me/Ribasadm1_bot?start=g6` |
+
 ## O que falta
 
-- **Captura nos grupos.** 46.000 membros em 3 canais nunca tiveram um lead
-  capturado (grupos 6, 7 e 8 — o 7 sozinho tem 31 mil, mais que toda a base de
-  Telegram atual). O caminho é postar o link do bot dentro dos próprios grupos,
-  com payload por grupo, e pedir o telefone via `request_contact` — que devolve o
-  número verificado pelo Telegram.
+- **Postar os links nos grupos** e acompanhar `captura_grupos`. Prioridade: g7
+  (31 mil, 0% de cobertura), g8 (14 mil) e g6 (1 mil) — nunca capturados.
 - **Painel.** Depois que os números da captura existirem.
+
+## Migrations (atualizado)
+
+| arquivo | conteúdo |
+|---|---|
+| `0006_captura_grupos.sql` | `codigo` por grupo, `telegram_capturas`, `capturar_start`, view `captura_grupos` |
+| `0007_capturar_contato.sql` | `capturar_contato` (merge inverso, deriva o grupo) |
