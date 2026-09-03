@@ -176,6 +176,7 @@ próprio usuário, e o fluxo ainda checa `contact.user_id == from.id`.
 | `novo` | nem telefone nem telegram existiam |
 | `ja_completo` | reenvio, já estava ligado |
 | `conflito_telegram` | o telefone já está ligado a outro telegram_id |
+| `telefone_divergente` | lead já tem outro telefone; mantém o original, só registra |
 | `telefone_invalido` | número não normaliza |
 
 Testado 9/9 cenários contra a base real; dados de teste removidos.
@@ -214,3 +215,4 @@ Poste dentro de cada canal. Reutilizáveis por qualquer membro (não são consum
 |---|---|
 | `0006_captura_grupos.sql` | `codigo` por grupo, `telegram_capturas`, `capturar_start`, view `captura_grupos` |
 | `0007_capturar_contato.sql` | `capturar_contato` (merge inverso, deriva o grupo) |
+| `0008_capturar_contato_nao_sobrescreve.sql` | não sobrescreve telefone existente (fix do teste) |
