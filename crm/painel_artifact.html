@@ -4,145 +4,198 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --bg:#f4f6fa; --card:#ffffff; --line:#e3e8f0; --tx:#1a2330; --mut:#5c6675;
-  --accent:#1a73e8; --good:#1a9d5a; --warn:#d1483a; --idle:#ccd4e0; --track:#eef1f6;
-  --shadow:0 1px 2px rgba(20,30,50,.05),0 8px 24px rgba(20,30,50,.04);
+  --bg:#f5f6f9; --card:#ffffff; --line:#e4e8f0; --tx:#1a2230; --mut:#59626f;
+  --crm:#b26a12; --tg:#1a86c9; --bridge:#1a9d5a; --warn:#d1483a;
+  --track:#eef1f6; --idle:#ccd4e0;
+  --crm-bg:#fbf4e9; --tg-bg:#eaf4fb; --bridge-bg:#e9f6ef;
+  --shadow:0 1px 2px rgba(20,30,50,.05),0 10px 30px rgba(20,30,50,.05);
 }
-:root:not([data-theme="light"]){ }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0d1017; --card:#161b24; --line:#252d3a; --tx:#e7ebf2; --mut:#8894a5;
-    --accent:#35b9f7; --good:#33c47a; --warn:#e6604f; --idle:#39424f; --track:#0b0e14;
+    --crm:#e0a33e; --tg:#39bdf9; --bridge:#33c47a; --warn:#e6604f;
+    --track:#0b0e14; --idle:#39424f;
+    --crm-bg:#1e1a12; --tg-bg:#0f1a24; --bridge-bg:#0f1c16;
     --shadow:0 1px 2px rgba(0,0,0,.3);
   }
 }
 :root[data-theme="dark"]{
   --bg:#0d1017; --card:#161b24; --line:#252d3a; --tx:#e7ebf2; --mut:#8894a5;
-  --accent:#35b9f7; --good:#33c47a; --warn:#e6604f; --idle:#39424f; --track:#0b0e14;
+  --crm:#e0a33e; --tg:#39bdf9; --bridge:#33c47a; --warn:#e6604f;
+  --track:#0b0e14; --idle:#39424f;
+  --crm-bg:#1e1a12; --tg-bg:#0f1a24; --bridge-bg:#0f1c16;
   --shadow:0 1px 2px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);
   font-family:"IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;
   padding:32px 22px 56px;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1080px;margin:0 auto}
+.wrap{max-width:1120px;margin:0 auto}
 .num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
 
-/* header */
-header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
-  flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:26px}
-.brand h1{font-size:19px;font-weight:600;margin:0;letter-spacing:-.2px}
-.brand .ey{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:2.5px;
-  text-transform:uppercase;color:var(--accent);margin:0 0 6px}
-.brand p{margin:6px 0 0;color:var(--mut);font-size:13px;max-width:52ch;line-height:1.5}
-.hero{text-align:right;flex-shrink:0}
-.hero .hv{font-family:"IBM Plex Mono",monospace;font-size:44px;font-weight:600;
-  line-height:1;color:var(--accent);letter-spacing:-1px}
-.hero .hl{font-size:12px;color:var(--mut);margin-top:6px;letter-spacing:.3px}
-.hero .hs{font-size:11px;color:var(--mut);opacity:.8;margin-top:2px}
+header{margin-bottom:26px}
+.ey{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--bridge);margin:0 0 7px}
+header h1{font-size:22px;font-weight:600;margin:0;letter-spacing:-.3px}
+header p{margin:7px 0 0;color:var(--mut);font-size:13px;max-width:60ch;line-height:1.55}
+
+/* two worlds */
+.worlds{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;
+  margin:22px 0 6px}
+.world{border:1px solid var(--line);border-radius:14px;padding:20px 20px 16px;
+  background:var(--card);box-shadow:var(--shadow);position:relative;z-index:1}
+.world.crm{background:linear-gradient(180deg,var(--crm-bg),var(--card) 62%);border-color:color-mix(in srgb,var(--crm) 30%,var(--line))}
+.world.tg{background:linear-gradient(180deg,var(--tg-bg),var(--card) 62%);border-color:color-mix(in srgb,var(--tg) 30%,var(--line))}
+.wh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+.wh .wt{font-size:13px;font-weight:600;letter-spacing:.2px}
+.wh .wk{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;padding:3px 8px;border-radius:20px}
+.crm .wk{color:var(--crm);background:color-mix(in srgb,var(--crm) 14%,transparent)}
+.tg .wk{color:var(--tg);background:color-mix(in srgb,var(--tg) 14%,transparent)}
+.wbig{font-family:"IBM Plex Mono",monospace;font-size:38px;font-weight:600;line-height:1;letter-spacing:-1.5px}
+.crm .wbig{color:var(--crm)} .tg .wbig{color:var(--tg)}
+.wbl{font-size:12px;color:var(--mut);margin:6px 0 16px}
+.wstat{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.wstat b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums}
+.wstat .sl{color:var(--mut)}
+
+/* bridge center */
+.bridge{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 22px;position:relative;z-index:2}
+.bridge::before,.bridge::after{content:"";position:absolute;top:50%;height:2px;width:22px;
+  background:repeating-linear-gradient(90deg,var(--bridge) 0 5px,transparent 5px 10px)}
+.bridge::before{left:-1px} .bridge::after{right:-1px}
+.medal{width:118px;height:118px;border-radius:50%;background:var(--bridge-bg);
+  border:2px solid color-mix(in srgb,var(--bridge) 55%,var(--line));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:var(--shadow)}
+.medal .mv{font-family:"IBM Plex Mono",monospace;font-size:40px;font-weight:600;
+  line-height:1;color:var(--bridge)}
+.medal .ml{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.bmech{font-size:11px;color:var(--mut);text-align:center;margin-top:12px;max-width:130px;line-height:1.4}
+.bmech b{color:var(--bridge);font-weight:600}
 
 /* section label */
-.lab{display:flex;align-items:baseline;gap:10px;margin:30px 0 13px}
-.lab h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;
-  color:var(--mut);margin:0}
-.lab .hint{font-size:12px;color:var(--mut);opacity:.7}
+.lab{display:flex;align-items:baseline;gap:10px;margin:32px 0 13px}
+.lab .tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;padding:3px 8px;border-radius:5px}
+.lab.crm .tag{color:var(--crm);background:color-mix(in srgb,var(--crm) 13%,transparent)}
+.lab.tg .tag{color:var(--tg);background:color-mix(in srgb,var(--tg) 13%,transparent)}
+.lab h2{font-size:13px;font-weight:600;margin:0;letter-spacing:.2px}
+.lab .hint{font-size:12px;color:var(--mut);opacity:.75}
 .lab .ln{flex:1;height:1px;background:var(--line)}
 
-/* tiles */
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:10px;
   padding:15px 16px;box-shadow:var(--shadow)}
-.tile.key{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
-.tile .tv{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;
-  letter-spacing:-.5px}
-.tile.key .tv{color:var(--accent)}
+.tile .tv{font-family:"IBM Plex Mono",monospace;font-size:23px;font-weight:600;letter-spacing:-.5px}
 .tile .tl{color:var(--mut);font-size:12px;margin-top:5px}
-.tile .ts{color:var(--mut);font-size:11px;margin-top:3px;opacity:.75}
+.tile.mutewarn .tv{color:var(--warn)}
 
-/* bar rows */
 .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;
   padding:6px 18px;box-shadow:var(--shadow)}
-.row{display:grid;grid-template-columns:200px 1fr 172px;align-items:center;gap:14px;
+.row{display:grid;grid-template-columns:196px 1fr 168px;align-items:center;gap:14px;
   padding:11px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
 .rn{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rn .cd{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);margin-right:7px}
 .rb{height:9px;background:var(--track);border-radius:5px;overflow:hidden;position:relative}
 .rf{position:absolute;inset:0 auto 0 0;border-radius:5px}
-.rf.ac{background:var(--accent)} .rf.good{background:var(--good)}
+.rf.tg{background:var(--tg)} .rf.good{background:var(--bridge)}
 .rf.warn{background:var(--warn)} .rf.idle{background:var(--idle)}
-.rx{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right;
-  font-variant-numeric:tabular-nums}
+.rx{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
 .rx b{font-weight:600}.mut{color:var(--mut)}
-.tot{display:grid;grid-template-columns:200px 1fr 172px;gap:14px;padding:13px 0 4px;
+.tot{display:grid;grid-template-columns:196px 1fr 168px;gap:14px;padding:13px 0 4px;
   border-top:1px solid var(--line);margin-top:2px}
 .tot .rn{font-weight:600}
 
-.two{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:start}
+.two{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;align-items:start;margin-top:4px}
 .orow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
   padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
 .orow:last-child{border-bottom:0}
-.orow .on{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.orow .on{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .orow b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums}
-.orow .obar{flex:1;height:6px;background:var(--track);border-radius:4px;overflow:hidden;max-width:120px}
-.orow .obar i{display:block;height:100%;background:color-mix(in srgb,var(--accent) 45%,var(--track))}
+.orow .obar{flex:1;height:6px;background:var(--track);border-radius:4px;overflow:hidden;max-width:110px}
+.orow .obar i{display:block;height:100%;background:color-mix(in srgb,var(--crm) 45%,var(--track))}
 
 footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
   color:var(--mut);font-size:12px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);
-  margin-right:6px;vertical-align:middle}
-@media(max-width:760px){
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--bridge);margin-right:6px;vertical-align:middle}
+
+@media(max-width:780px){
+  .worlds{grid-template-columns:1fr;gap:0}
+  .bridge{padding:14px 0;flex-direction:row;gap:14px}
+  .bridge::before,.bridge::after{left:50%;top:auto;width:2px;height:14px;
+    background:repeating-linear-gradient(180deg,var(--bridge) 0 5px,transparent 5px 10px)}
+  .bridge::before{top:-1px} .bridge::after{bottom:-1px;top:auto}
+  .bmech{margin-top:0;text-align:left}
   .two{grid-template-columns:1fr}
-  .row,.tot{grid-template-columns:1fr 90px;grid-template-rows:auto auto;row-gap:7px}
+  .row,.tot{grid-template-columns:1fr 84px;grid-template-rows:auto auto;row-gap:7px}
   .rb{grid-column:1/-1;order:3}.rx{grid-column:2;grid-row:1}
-  .hero{text-align:left}
 }
 </style>
 
 <div class="wrap">
   <header>
-    <div class="brand">
-      <p class="ey">experts-painel · CRM</p>
-      <h1>Ponte lead_id</h1>
-      <p>A chave única que liga <b>telefone</b> (CRM) a <b>telegram_id</b> — nascida de opt-in. Este é o estado da base e do funil de captura.</p>
-    </div>
-    <div class="hero">
-      <div class="hv num" id="h-ponte">1</div>
-      <div class="hl">pontes completas</div>
-      <div class="hs">telefone + telegram no mesmo lead</div>
-    </div>
+    <p class="ey">experts-painel · CRM Ribas</p>
+    <h1>Ponte lead_id</h1>
+    <p>Dois mundos com chaves diferentes — o CRM conhece o <b>telefone</b>, o Telegram conhece o <b>telegram_id</b>. A ponte é a chave única que liga os dois no mesmo lead, e ela só nasce de opt-in.</p>
   </header>
 
-  <div class="lab"><h2>Base</h2><span class="ln"></span><span class="hint" id="lab-total"></span></div>
-  <div class="tiles" id="t-base"></div>
+  <div class="worlds">
+    <div class="world crm">
+      <div class="wh"><span class="wt">Mundo CRM</span><span class="wk">telefone · e-mail</span></div>
+      <div class="wbig num" id="c-tel">154.604</div>
+      <div class="wbl">leads só com telefone</div>
+      <div class="wstat"><span class="sl">com e-mail</span><b class="num" id="c-mail">48.055</b></div>
+      <div class="wstat"><span class="sl">disparáveis (consentidos)</span><b class="num" id="c-disp">41.509</b></div>
+      <div class="wstat"><span class="sl">sem consentimento</span><b class="num" id="c-sem">113.096</b></div>
+    </div>
 
-  <div class="lab"><h2>Disparável por canal</h2><span class="ln"></span><span class="hint">com consentimento de marketing</span></div>
-  <div class="tiles" id="t-canais"></div>
+    <div class="bridge">
+      <div class="medal"><div class="mv num" id="b-ponte">1</div><div class="ml">ponte</div></div>
+      <div class="bmech">telefone + telegram no mesmo lead · via <b>opt-in</b> · <span class="num" id="b-tok">1/1</span> tokens</div>
+    </div>
 
-  <div class="lab"><h2>Captura nos grupos</h2><span class="ln"></span><span class="hint">telefone confirmado · membros endereçáveis</span></div>
-  <div class="panel" id="p-captura"></div>
+    <div class="world tg">
+      <div class="wh"><span class="wt">Mundo Telegram</span><span class="wk">grupos · telegram_id</span></div>
+      <div class="wbig num" id="t-tel">21.823</div>
+      <div class="wbl">leads só com telegram</div>
+      <div class="wstat"><span class="sl">membros nos 8 grupos</span><b class="num" id="t-mem">73.020</b></div>
+      <div class="wstat"><span class="sl">conhecidos na base</span><b class="num" id="t-conh">21.824</b></div>
+      <div class="wstat"><span class="sl">opt-in confirmado</span><b class="num" id="t-opt">1</b></div>
+    </div>
+  </div>
+
+  <div class="lab crm"><span class="tag">CRM</span><h2>Disparável por canal</h2><span class="ln"></span><span class="hint">com consentimento de marketing</span></div>
+  <div class="tiles" id="s-canais"></div>
+
+  <div class="lab tg"><span class="tag">Telegram</span><h2>Captura nos grupos</h2><span class="ln"></span><span class="hint">telefone confirmado · membros endereçáveis</span></div>
+  <div class="panel" id="s-captura"></div>
 
   <div class="two">
     <div>
-      <div class="lab"><h2>Cobertura conhecida</h2><span class="ln"></span></div>
-      <div class="panel" id="p-cobertura"></div>
+      <div class="lab tg"><span class="tag">Telegram</span><h2>Cobertura conhecida</h2><span class="ln"></span></div>
+      <div class="panel" id="s-cobertura"></div>
     </div>
     <div>
-      <div class="lab"><h2>Top origens</h2><span class="ln"></span></div>
-      <div class="panel" id="p-origens" style="padding:6px 16px"></div>
+      <div class="lab crm"><span class="tag">CRM</span><h2>Top origens</h2><span class="ln"></span></div>
+      <div class="panel" id="s-origens" style="padding:6px 16px"></div>
     </div>
   </div>
 
   <footer>
-    <span><span class="dot"></span>Instantâneo de <b id="f-data">03/09/2026 12:15</b> · dados agregados, sem PII</span>
+    <span><span class="dot"></span>Instantâneo de <b id="f-data">03/09/2026 15:21</b> · dados agregados, sem PII</span>
     <span class="mut">176.428 leads · 8 canais Telegram</span>
   </footer>
 </div>
 
 <script>
 const D = {
-  base:{total:176428, com_telefone:154605, com_email:48055, com_telegram:21824, ponte:1, sem_consentimento:113096},
+  base:{total:176428, com_telefone:154605, com_email:48055, com_telegram:21824, ponte:1, sem_consentimento:113096, so_telefone:154604, so_telegram:21823},
   canais:{sms:41394, ligacao:41509, email:41508, telegram_optin:1},
+  tokens:{gerados:1, usados:1},
   captura:[
     {cd:"g7", nome:"Mentoria Hacker Slot", membros:31000, cap:0},
     {cd:"g5", nome:"Analistas Wolf", membros:15050, cap:0},
@@ -173,56 +226,51 @@ const D = {
 };
 const fmt = n => n.toLocaleString("pt-BR");
 const pct = (a,b) => b>0 ? Math.round(a/b*1000)/10 : 0;
-const el = (h) => { const t=document.createElement("template"); t.innerHTML=h.trim(); return t.content.firstChild; };
+const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
 
-function tile(v,l,s,key){ return `<div class="tile${key?' key':''}"><div class="tv num">${v}</div><div class="tl">${l}</div>${s?`<div class="ts">${s}</div>`:''}`; }
+set("c-tel", fmt(D.base.so_telefone));
+set("c-mail", fmt(D.base.com_email));
+set("c-disp", fmt(D.canais.ligacao));
+set("c-sem", fmt(D.base.sem_consentimento));
+set("b-ponte", fmt(D.base.ponte));
+set("b-tok", D.tokens.usados+"/"+D.tokens.gerados);
+set("t-tel", fmt(D.base.so_telegram));
+const memTot = D.captura.reduce((s,g)=>s+g.membros,0);
+set("t-mem", fmt(memTot));
+set("t-conh", fmt(D.base.com_telegram));
+set("t-opt", fmt(D.canais.telegram_optin));
 
-document.getElementById("lab-total").textContent = fmt(D.base.total)+" leads";
-document.getElementById("h-ponte").textContent = fmt(D.base.ponte);
-
-document.getElementById("t-base").innerHTML =
-  tile(fmt(D.base.total),"leads totais")+
-  tile(fmt(D.base.com_telefone),"com telefone")+
-  tile(fmt(D.base.com_email),"com e-mail")+
-  tile(fmt(D.base.com_telegram),"com telegram")+
-  tile(fmt(D.base.ponte),"ponte completa","telefone + telegram",true);
-
-document.getElementById("t-canais").innerHTML =
+function tile(v,l,warn){ return `<div class="tile${warn?' mutewarn':''}"><div class="tv num">${v}</div><div class="tl">${l}</div></div>`; }
+document.getElementById("s-canais").innerHTML =
   tile(fmt(D.canais.sms),"SMS")+
   tile(fmt(D.canais.ligacao),"ligação")+
   tile(fmt(D.canais.email),"e-mail")+
-  tile(fmt(D.canais.telegram_optin),"opt-in Telegram","confirmados no bot",true)+
-  tile(fmt(D.base.sem_consentimento),"sem consentimento","não disparável");
+  tile(fmt(D.base.sem_consentimento),"sem consentimento",true);
 
 const capMax = Math.max(...D.captura.map(g=>g.membros));
 let capT=0, memT=0;
-document.getElementById("p-captura").innerHTML = D.captura.map(g=>{
+document.getElementById("s-captura").innerHTML = D.captura.map(g=>{
   capT+=g.cap; memT+=g.membros;
   const trackW = Math.max(3, Math.round(g.membros/capMax*100));
   const fillW = g.membros>0 ? Math.round(g.cap/g.membros*100) : 0;
-  const tone = g.cap>0 ? "good" : "idle";
   return `<div class="row">
     <div class="rn"><span class="cd">${g.cd}</span>${g.nome}</div>
-    <div class="rb" style="width:${trackW}%"><div class="rf ${tone}" style="width:${fillW}%"></div></div>
+    <div class="rb" style="width:${trackW}%"><div class="rf ${g.cap>0?'good':'idle'}" style="width:${fillW}%"></div></div>
     <div class="rx"><b>${fmt(g.cap)}</b> <span class="mut">/ ${fmt(g.membros)}</span></div>
   </div>`;
 }).join("") +
-  `<div class="tot">
-    <div class="rn">Total endereçável</div><div></div>
-    <div class="rx"><b>${fmt(capT)}</b> <span class="mut">/ ${fmt(memT)} · ${pct(capT,memT)}%</span></div>
-  </div>`;
+  `<div class="tot"><div class="rn">Total endereçável</div><div></div>
+    <div class="rx"><b>${fmt(capT)}</b> <span class="mut">/ ${fmt(memT)} · ${pct(capT,memT)}%</span></div></div>`;
 
-document.getElementById("p-cobertura").innerHTML = D.cobertura.map(g=>{
-  const tone = g.pct===0 ? "warn" : "ac";
-  return `<div class="row" style="grid-template-columns:190px 1fr 120px">
+document.getElementById("s-cobertura").innerHTML = D.cobertura.map(g=>
+  `<div class="row" style="grid-template-columns:180px 1fr 118px">
     <div class="rn">${g.nome}</div>
-    <div class="rb"><div class="rf ${tone}" style="width:${Math.max(2,g.pct)}%"></div></div>
+    <div class="rb"><div class="rf ${g.pct===0?'warn':'tg'}" style="width:${Math.max(2,g.pct)}%"></div></div>
     <div class="rx">${g.pct}% <span class="mut">${fmt(g.conh)}</span></div>
-  </div>`;
-}).join("");
+  </div>`).join("");
 
 const oMax = Math.max(...D.origens.map(o=>o.n));
-document.getElementById("p-origens").innerHTML = D.origens.map(o=>
+document.getElementById("s-origens").innerHTML = D.origens.map(o=>
   `<div class="orow"><span class="on">${o.origem}</span>
    <span class="obar"><i style="width:${Math.round(o.n/oMax*100)}%"></i></span>
    <b>${fmt(o.n)}</b></div>`).join("");
