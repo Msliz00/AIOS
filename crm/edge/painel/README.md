@@ -13,3 +13,13 @@ Deploy (via MCP Supabase `deploy_edge_function`, ou CLI):
 `supabase functions deploy painel --no-verify-jwt`
 
 O `index.ts` neste diretório é a fonte da versão deployada.
+
+## Nota (03/09): render bloqueado
+
+O Supabase serve respostas de edge function como `text/plain`, então o
+navegador exibe o HTML como texto cru em vez de renderizar. Nao ha header
+que contorne (politica da plataforma). A `painel_dados()` (RPC) continua
+util como fonte de dados; para visualizacao o painel vive como Artifact
+(`crm/painel_artifact.html`), atualizado sob demanda. Se um dia precisar
+de painel vivo hospedado, o caminho e Vercel/Cloudflare Pages lendo a RPC,
+ou um workflow n8n que responde HTML.

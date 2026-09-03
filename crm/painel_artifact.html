@@ -1,0 +1,229 @@
+<title>Ponte lead_id</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --line:#e3e8f0; --tx:#1a2330; --mut:#5c6675;
+  --accent:#1a73e8; --good:#1a9d5a; --warn:#d1483a; --idle:#ccd4e0; --track:#eef1f6;
+  --shadow:0 1px 2px rgba(20,30,50,.05),0 8px 24px rgba(20,30,50,.04);
+}
+:root:not([data-theme="light"]){ }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1017; --card:#161b24; --line:#252d3a; --tx:#e7ebf2; --mut:#8894a5;
+    --accent:#35b9f7; --good:#33c47a; --warn:#e6604f; --idle:#39424f; --track:#0b0e14;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1017; --card:#161b24; --line:#252d3a; --tx:#e7ebf2; --mut:#8894a5;
+  --accent:#35b9f7; --good:#33c47a; --warn:#e6604f; --idle:#39424f; --track:#0b0e14;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:"IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;
+  padding:32px 22px 56px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+/* header */
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
+  flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:26px}
+.brand h1{font-size:19px;font-weight:600;margin:0;letter-spacing:-.2px}
+.brand .ey{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+.brand p{margin:6px 0 0;color:var(--mut);font-size:13px;max-width:52ch;line-height:1.5}
+.hero{text-align:right;flex-shrink:0}
+.hero .hv{font-family:"IBM Plex Mono",monospace;font-size:44px;font-weight:600;
+  line-height:1;color:var(--accent);letter-spacing:-1px}
+.hero .hl{font-size:12px;color:var(--mut);margin-top:6px;letter-spacing:.3px}
+.hero .hs{font-size:11px;color:var(--mut);opacity:.8;margin-top:2px}
+
+/* section label */
+.lab{display:flex;align-items:baseline;gap:10px;margin:30px 0 13px}
+.lab h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;
+  color:var(--mut);margin:0}
+.lab .hint{font-size:12px;color:var(--mut);opacity:.7}
+.lab .ln{flex:1;height:1px;background:var(--line)}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:15px 16px;box-shadow:var(--shadow)}
+.tile.key{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.tile .tv{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;
+  letter-spacing:-.5px}
+.tile.key .tv{color:var(--accent)}
+.tile .tl{color:var(--mut);font-size:12px;margin-top:5px}
+.tile .ts{color:var(--mut);font-size:11px;margin-top:3px;opacity:.75}
+
+/* bar rows */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:6px 18px;box-shadow:var(--shadow)}
+.row{display:grid;grid-template-columns:200px 1fr 172px;align-items:center;gap:14px;
+  padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.rn{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rn .cd{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);margin-right:7px}
+.rb{height:9px;background:var(--track);border-radius:5px;overflow:hidden;position:relative}
+.rf{position:absolute;inset:0 auto 0 0;border-radius:5px}
+.rf.ac{background:var(--accent)} .rf.good{background:var(--good)}
+.rf.warn{background:var(--warn)} .rf.idle{background:var(--idle)}
+.rx{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right;
+  font-variant-numeric:tabular-nums}
+.rx b{font-weight:600}.mut{color:var(--mut)}
+.tot{display:grid;grid-template-columns:200px 1fr 172px;gap:14px;padding:13px 0 4px;
+  border-top:1px solid var(--line);margin-top:2px}
+.tot .rn{font-weight:600}
+
+.two{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:start}
+.orow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.orow:last-child{border-bottom:0}
+.orow .on{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.orow b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums}
+.orow .obar{flex:1;height:6px;background:var(--track);border-radius:4px;overflow:hidden;max-width:120px}
+.orow .obar i{display:block;height:100%;background:color-mix(in srgb,var(--accent) 45%,var(--track))}
+
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+  color:var(--mut);font-size:12px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);
+  margin-right:6px;vertical-align:middle}
+@media(max-width:760px){
+  .two{grid-template-columns:1fr}
+  .row,.tot{grid-template-columns:1fr 90px;grid-template-rows:auto auto;row-gap:7px}
+  .rb{grid-column:1/-1;order:3}.rx{grid-column:2;grid-row:1}
+  .hero{text-align:left}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <p class="ey">experts-painel · CRM</p>
+      <h1>Ponte lead_id</h1>
+      <p>A chave única que liga <b>telefone</b> (CRM) a <b>telegram_id</b> — nascida de opt-in. Este é o estado da base e do funil de captura.</p>
+    </div>
+    <div class="hero">
+      <div class="hv num" id="h-ponte">1</div>
+      <div class="hl">pontes completas</div>
+      <div class="hs">telefone + telegram no mesmo lead</div>
+    </div>
+  </header>
+
+  <div class="lab"><h2>Base</h2><span class="ln"></span><span class="hint" id="lab-total"></span></div>
+  <div class="tiles" id="t-base"></div>
+
+  <div class="lab"><h2>Disparável por canal</h2><span class="ln"></span><span class="hint">com consentimento de marketing</span></div>
+  <div class="tiles" id="t-canais"></div>
+
+  <div class="lab"><h2>Captura nos grupos</h2><span class="ln"></span><span class="hint">telefone confirmado · membros endereçáveis</span></div>
+  <div class="panel" id="p-captura"></div>
+
+  <div class="two">
+    <div>
+      <div class="lab"><h2>Cobertura conhecida</h2><span class="ln"></span></div>
+      <div class="panel" id="p-cobertura"></div>
+    </div>
+    <div>
+      <div class="lab"><h2>Top origens</h2><span class="ln"></span></div>
+      <div class="panel" id="p-origens" style="padding:6px 16px"></div>
+    </div>
+  </div>
+
+  <footer>
+    <span><span class="dot"></span>Instantâneo de <b id="f-data">03/09/2026 12:15</b> · dados agregados, sem PII</span>
+    <span class="mut">176.428 leads · 8 canais Telegram</span>
+  </footer>
+</div>
+
+<script>
+const D = {
+  base:{total:176428, com_telefone:154605, com_email:48055, com_telegram:21824, ponte:1, sem_consentimento:113096},
+  canais:{sms:41394, ligacao:41509, email:41508, telegram_optin:1},
+  captura:[
+    {cd:"g7", nome:"Mentoria Hacker Slot", membros:31000, cap:0},
+    {cd:"g5", nome:"Analistas Wolf", membros:15050, cap:0},
+    {cd:"g8", nome:"Mentoria Hacker Of Slot \u{1F3C6}", membros:14000, cap:0},
+    {cd:"g2", nome:"HACKER SLOTS TITANIUN", membros:3731, cap:0},
+    {cd:"g3", nome:"Mentoria Hacker Dados", membros:3348, cap:0},
+    {cd:"g1", nome:"Mentoria Hacker Slots 3.0 \u{1F3C6}", membros:2613, cap:0},
+    {cd:"g4", nome:"Pererafany Slot", membros:2278, cap:0},
+    {cd:"g6", nome:"Mentoria Hacker Of Slot", membros:1000, cap:0}
+  ],
+  cobertura:[
+    {nome:"Mentoria Hacker Slot", membros:31000, conh:0, pct:0},
+    {nome:"Analistas Wolf", membros:15050, conh:10712, pct:71.2},
+    {nome:"Mentoria Hacker Of Slot \u{1F3C6}", membros:14000, conh:0, pct:0},
+    {nome:"HACKER SLOTS TITANIUN", membros:3731, conh:3473, pct:93.1},
+    {nome:"Mentoria Hacker Dados", membros:3348, conh:3056, pct:91.3},
+    {nome:"Mentoria Hacker Slots 3.0 \u{1F3C6}", membros:2613, conh:2431, pct:93.0},
+    {nome:"Pererafany Slot", membros:2278, conh:2151, pct:94.4},
+    {nome:"Mentoria Hacker Of Slot", membros:1000, conh:0, pct:0}
+  ],
+  origens:[
+    {origem:"BTAG 35246", n:60139},{origem:"DANI MORAES", n:34896},
+    {origem:"telegram_grupo", n:21823},{origem:"LIFETIME 49660", n:16342},
+    {origem:"BASE 2", n:10732},{origem:"BASE 1", n:9992},
+    {origem:"BTAG 48801 MAIO", n:4972},{origem:"APP RIBAS JANEIRO", n:4195},
+    {origem:"BASE BTAG 35556", n:4125},{origem:"LIFETIME 77335", n:3497}
+  ]
+};
+const fmt = n => n.toLocaleString("pt-BR");
+const pct = (a,b) => b>0 ? Math.round(a/b*1000)/10 : 0;
+const el = (h) => { const t=document.createElement("template"); t.innerHTML=h.trim(); return t.content.firstChild; };
+
+function tile(v,l,s,key){ return `<div class="tile${key?' key':''}"><div class="tv num">${v}</div><div class="tl">${l}</div>${s?`<div class="ts">${s}</div>`:''}`; }
+
+document.getElementById("lab-total").textContent = fmt(D.base.total)+" leads";
+document.getElementById("h-ponte").textContent = fmt(D.base.ponte);
+
+document.getElementById("t-base").innerHTML =
+  tile(fmt(D.base.total),"leads totais")+
+  tile(fmt(D.base.com_telefone),"com telefone")+
+  tile(fmt(D.base.com_email),"com e-mail")+
+  tile(fmt(D.base.com_telegram),"com telegram")+
+  tile(fmt(D.base.ponte),"ponte completa","telefone + telegram",true);
+
+document.getElementById("t-canais").innerHTML =
+  tile(fmt(D.canais.sms),"SMS")+
+  tile(fmt(D.canais.ligacao),"ligação")+
+  tile(fmt(D.canais.email),"e-mail")+
+  tile(fmt(D.canais.telegram_optin),"opt-in Telegram","confirmados no bot",true)+
+  tile(fmt(D.base.sem_consentimento),"sem consentimento","não disparável");
+
+const capMax = Math.max(...D.captura.map(g=>g.membros));
+let capT=0, memT=0;
+document.getElementById("p-captura").innerHTML = D.captura.map(g=>{
+  capT+=g.cap; memT+=g.membros;
+  const trackW = Math.max(3, Math.round(g.membros/capMax*100));
+  const fillW = g.membros>0 ? Math.round(g.cap/g.membros*100) : 0;
+  const tone = g.cap>0 ? "good" : "idle";
+  return `<div class="row">
+    <div class="rn"><span class="cd">${g.cd}</span>${g.nome}</div>
+    <div class="rb" style="width:${trackW}%"><div class="rf ${tone}" style="width:${fillW}%"></div></div>
+    <div class="rx"><b>${fmt(g.cap)}</b> <span class="mut">/ ${fmt(g.membros)}</span></div>
+  </div>`;
+}).join("") +
+  `<div class="tot">
+    <div class="rn">Total endereçável</div><div></div>
+    <div class="rx"><b>${fmt(capT)}</b> <span class="mut">/ ${fmt(memT)} · ${pct(capT,memT)}%</span></div>
+  </div>`;
+
+document.getElementById("p-cobertura").innerHTML = D.cobertura.map(g=>{
+  const tone = g.pct===0 ? "warn" : "ac";
+  return `<div class="row" style="grid-template-columns:190px 1fr 120px">
+    <div class="rn">${g.nome}</div>
+    <div class="rb"><div class="rf ${tone}" style="width:${Math.max(2,g.pct)}%"></div></div>
+    <div class="rx">${g.pct}% <span class="mut">${fmt(g.conh)}</span></div>
+  </div>`;
+}).join("");
+
+const oMax = Math.max(...D.origens.map(o=>o.n));
+document.getElementById("p-origens").innerHTML = D.origens.map(o=>
+  `<div class="orow"><span class="on">${o.origem}</span>
+   <span class="obar"><i style="width:${Math.round(o.n/oMax*100)}%"></i></span>
+   <b>${fmt(o.n)}</b></div>`).join("");
+</script>
