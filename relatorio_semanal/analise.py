@@ -6,7 +6,7 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 
-from .config import ExpertConfig, Regua
+from .config import OFERTAS_PADRAO, ExpertConfig, Regua
 from .criativos import AbaCriativos, Criativo
 from .operacao import Janela
 
@@ -84,7 +84,7 @@ def agrupar(aba: AbaCriativos, cfg: ExpertConfig) -> tuple[list[Grupo], list[Gru
         fam.setdefault(nome_f, Grupo(nome_f, nome_f)).itens.append(c)
         mult = cfg.multiplicador_de(c.nome) if (f and f.usa_multiplicador) else None
         if f and f.usa_multiplicador:
-            chave = f"{nome_f} {mult}" if mult else f"{nome_f} · s/ mult."
+            chave = f"{nome_f} {mult}" if mult else f"{nome_f} (s/ mult.)"
         else:
             chave = nome_f
         g = sub.setdefault(chave, Grupo(chave, nome_f, mult))
@@ -189,13 +189,8 @@ _RX_CTA_TOKENS = [
     ("Com legenda", re.compile(r"COM\s*LEGENDA|LEGENDADO|\+\s*LEGENDA", re.I)),
     ("Sem legenda", re.compile(r"SEM\s*LEGENDA", re.I)),
     ("Hook", re.compile(r"\bHOOK\b", re.I)),
-]
-_RX_OFERTA_TOKENS = [
-    ("Grupo grátis", re.compile(r"GRUPO.*GR[AÁ]TIS|GR[AÁ]TIS|DE\s*GRA[CÇ]A", re.I)),
-    ("Prova (saque / social)", re.compile(r"SAQUE|PROVA", re.I)),
-    ("VIP", re.compile(r"\bVIP\b", re.I)),
-    ("Bônus / depósito", re.compile(r"BONUS|BÔNUS|DEP[OÓ]SITO", re.I)),
-    ("Sessão / sinal", re.compile(r"SESS[AÃ]O|SINAL|CORUJ[AÃ]O", re.I)),
+    ("Com música", re.compile(r"COM\s*M[UÚ]SICA", re.I)),
+    ("Sem música", re.compile(r"SEM\s*M[UÚ]SICA", re.I)),
 ]
 
 
@@ -240,7 +235,12 @@ def analisar(cfg: ExpertConfig, semana: Janela, anterior: Janela, aba: AbaCriati
             f"R$ {semana.gasto:,.0f}) — ignorada na análise por peça"
         )
         return a
-    if a.cobertura.pct is not None and a.cobertura.pct < 0.999:
+    if a.cobertura.pct is not None and a.cobertura.pct > 1.02:
+        a.avisos.append(
+            f"Aba de criativos soma {a.cobertura.pct:.0%} do gasto do diário — diário provavelmente "
+            "incompleto na janela (dia sem gasto lançado); C/FTD do diário pode estar subestimado"
+        )
+    elif a.cobertura.pct is not None and a.cobertura.pct < 0.999:
         a.avisos.append(
             f"Aba de criativos cobre {a.cobertura.pct:.0%} do gasto do diário — "
             "C/FTD por peça tem margem (dia final não detalhado)"
@@ -268,5 +268,5 @@ def analisar(cfg: ExpertConfig, semana: Janela, anterior: Janela, aba: AbaCriati
     com_oferta = [c for c in aba.criativos if cfg.marcadores_oferta.search(c.nome)]
     a.oferta_tem_sinal = bool(com_oferta)
     if a.oferta_tem_sinal:
-        a.oferta_grupos = _grupos_por_marcador(com_oferta, _RX_OFERTA_TOKENS)
+        a.oferta_grupos = _grupos_por_marcador(com_oferta, cfg.ofertas or OFERTAS_PADRAO)
     return a

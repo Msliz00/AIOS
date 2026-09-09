@@ -108,3 +108,16 @@ def test_semana_anterior_segunda_a_domingo():
     assert (ini, fim) == (dt.date(2026, 8, 31), dt.date(2026, 9, 6))
     ini, fim = semana_anterior(dt.date(2026, 9, 9))  # quarta → mesma semana anterior
     assert (ini, fim) == (dt.date(2026, 8, 31), dt.date(2026, 9, 6))
+
+
+# Suh (2º expert) ---------------------------------------------------------------
+def test_suh_s36(out):
+    j = operacao.ler_janela(FIX / "suh_operacao.xlsx", dt.date(2026, 8, 31), dt.date(2026, 9, 6))
+    assert j.abas_lidas == ["AGOSTO", "SETEMBRO"]
+    assert round(j.gasto, 2) == 16043.85 and j.leads == 791 and j.ftd == 56
+    p = gerar_relatorio_semanal("suh", dt.date(2026, 8, 31), dt.date(2026, 9, 6), xlsx_dir=FIX, out_dir=out)
+    t = _texto(p.read_text(encoding="utf-8"))
+    assert "S36 · 3108–0609" in t and "2/9 produção própria" in t
+    cfg = get_expert("suh")
+    assert cfg.multiplicador_de("Suh_corte_100x21h_10.03.26_v1.mp4") == "100X"
+    assert cfg.multiplicador_de("Suh_Lista08hS_Narracao_50x_26.05.26v3_v1.mp4") == "50X"

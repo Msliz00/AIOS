@@ -2,8 +2,8 @@
 
 `gerar_relatorio_semanal(expert, data_inicio, data_fim) -> Path` — baixa as duas
 planilhas do expert no Drive, soma o diário na janela, cruza com a aba semanal de
-criativos e escreve um HTML pronto pra mandar. Começa pelo Marques; outro expert =
-trocar dois IDs em `config.py`.
+criativos e escreve um HTML pronto pra mandar. Experts configurados: **marques** e **suh**. Outro expert =
+trocar dois IDs em `config.py` (e o regex de produção própria se o padrão de nome for outro).
 
 ## Uso
 
@@ -49,7 +49,7 @@ Saída: `relatorio_semanal/out/<expert>-relatorio-semanal-sNN.html`
 | `analise.py` | Agregação, ranking por FTD + C/FTD, cobertura, atribuição furada, deltas |
 | `textos.py` | Frases do relatório (regra-based; declara "sem base" em vez de inventar) |
 | `templates/relatorio.html.j2` | Hero · 01 cards · 02 quatro `.q` · 03 `.tbl` · 04 alerta · 05 próximo passo · footer |
-| `tests/` | Critério de pronto rodando sobre snapshot XLSX das planilhas (09/09/2026) |
+| `tests/` | Critério de pronto (Marques) + regressão Suh S36, sobre snapshot XLSX das planilhas (09/09/2026) |
 
 ## Critério de pronto (tests/test_marques.py)
 
@@ -85,5 +85,6 @@ envia pro canal. A função é pura (retorna Path), o nó só repassa o arquivo.
 | Service account com leitura nas 2 planilhas do Marques | 00BABY | Criar SA no GCP, compartilhar as planilhas com o e-mail da SA, apontar `GOOGLE_SERVICE_ACCOUNT_FILE` |
 | Template original S35 (se existir) | 00BABY | Anexar o HTML; trocar o `<style>` do `.j2` mantendo as variáveis |
 | Nó n8n de segunda 8h | 00BABY / n8n | Montar o fluxo acima depois da SA funcionar |
+| Produção própria da Suh é hipótese (`JOGADA_50X_SUH_VARn` / `50X VARn`) | 00BABY | Confirmar quais nomes são lote nosso e ajustar `producao_propria` no bloco `suh` |
 | Belodi, Iris, Lucas | 00BABY | Copiar o bloco `marques` em `EXPERTS`, trocar IDs e, se o nome dos criativos mudar, o regex de produção própria |
 | Marcador de CTA/oferta no nome dos criativos | Operação Marques | Sem isso, respostas 02 e 03 continuam "sem base" — é o dado que falta, não a função |

@@ -63,6 +63,8 @@ class ExpertConfig:
     marcadores_oferta: Pattern[str] = _rx(
         r"GRUPO|GR[AÁ]TIS|DE\s*GRA[CÇ]A|SAQUE|PROVA|\bVIP\b|BONUS|BÔNUS|DEP[OÓ]SITO|SINAL|SESS[AÃ]O|CORUJ[AÃ]O"
     )
+    # rótulos de oferta lidos do nome (rótulo, regex); None = OFERTAS_PADRAO
+    ofertas: tuple[tuple[str, Pattern[str]], ...] | None = None
     regua: Regua = Regua()
     tema: Tema = Tema()
     assinatura: str = "00BABY · IGAMING-MASTER-FLOW · Relatório semanal de criativos · +18"
@@ -81,6 +83,14 @@ class ExpertConfig:
         return bool(self.producao_propria.search(nome))
 
 
+OFERTAS_PADRAO: tuple[tuple[str, Pattern[str]], ...] = (
+    ("Grupo grátis", _rx(r"GRUPO.*GR[AÁ]TIS|GR[AÁ]TIS|DE\s*GRA[CÇ]A")),
+    ("Prova (saque / social)", _rx(r"SAQUE|PROVA")),
+    ("VIP", _rx(r"\bVIP\b")),
+    ("Bônus / depósito", _rx(r"BONUS|BÔNUS|DEP[OÓ]SITO")),
+    ("Sessão / sinal", _rx(r"SESS[AÃ]O|SINAL|CORUJ[AÃ]O")),
+)
+
 FAMILIAS_PADRAO: tuple[Familia, ...] = (
     Familia("Corte", _rx(r"CORTE"), usa_multiplicador=True),
     Familia("Gravação de tela", _rx(r"GRAVA\w*\s*DE\s*TELA"), usa_multiplicador=True),
@@ -88,6 +98,7 @@ FAMILIAS_PADRAO: tuple[Familia, ...] = (
     Familia("Caixinha de pergunta", _rx(r"CAIXINHA")),
     Familia("Jogada", _rx(r"JOGADA")),
     Familia("Lista gravada", _rx(r"LISTA\s+GRAVADA")),
+    Familia("Lista (horário)", _rx(r"LISTA\s*\d{1,2}H|\d+X\s*LISTA\s*\d{1,2}H"), usa_multiplicador=True),
     Familia("Roteirizado", _rx(r"ROTEIRIZADO")),
     Familia("RTP", _rx(r"\bRTP\b")),
     Familia("AD numerado", _rx(r"^AD\s*\d+\s*-\s*\d+\s*X"), usa_multiplicador=True),
@@ -105,7 +116,34 @@ EXPERTS: dict[str, ExpertConfig] = {
         # Lote interno: AD_N_CORTE_..., "AD N - 50X (...)", CXL_ADnn, ADnn_HOOK_CX..
         producao_propria=_rx(r"^(AD[\s_]*\d+|CXL_AD\d+|AD\d+_)"),
     ),
-    # Próximos experts: copiar o bloco acima e trocar os dois IDs.
+    "suh": ExpertConfig(
+        slug="suh",
+        nome="Suh",
+        produto="Aviator",
+        planilha_operacao_id="16DKJ-dG8eA-XEjxNwEyYZN5jUCiYrPlyAYDG9_PzRlI",
+        planilha_criativos_id="10-NSZ2aYlkjMxiNQCOgDwTwoOoFPdXH-SrN-3k-CvEQ",
+        familias=(
+            Familia("Gravação de tela", _rx(r"GRAVA\w*\s*DE\s*TELA|Gravaodetela"), usa_multiplicador=True),
+            Familia("Lista (horário)", _rx(r"LISTA\s*\d{1,2}H|\d+X\s*LISTA\s*\d{1,2}H"), usa_multiplicador=True),
+            Familia("Corte", _rx(r"CORTE"), usa_multiplicador=True),
+            Familia("Jogada", _rx(r"JOGADA"), usa_multiplicador=True),
+            Familia("Variação A/B", _rx(r"^\d+X\s*VAR\d"), usa_multiplicador=True),
+        ) + FAMILIAS_PADRAO,
+        # "100xCorujao": multiplicador colado em texto → só exige não vir dígito depois
+        multiplicador=_rx(r"(?<![0-9])(\d{2,4})\s*X"),
+        # HIPÓTESE a confirmar: lote nosso = variações JOGADA_50X_SUH_VARn / "50X VARn - …";
+        # "Suh_…_dd.mm.aa_vN" é o padrão da equipe do expert.
+        producao_propria=_rx(r"JOGADA_\d+X_SUH|^\d+X\s*VAR\d|_VAR\d"),
+        marcadores_cta=_rx(
+            r"\bCTA\b|LEGENDA|LEGENDADO|HUMANIZADO|\bHOOK\b|SEM CTA|COM CTA|BASICO|BÁSICO|HEADLINE|HEDLINE|M[UÚ]SICA"
+        ),
+        ofertas=(
+            ("Corujão (sessão da madrugada)", _rx(r"CORUJ[AÃ]O")),
+            ("Max Win", _rx(r"MAX\s*WIN")),
+            ("Lista com horário (08h/16h/21h/23h)", _rx(r"LISTA\s*\d{1,2}H|\d{1,2}H\b")),
+        ) + tuple(o for o in OFERTAS_PADRAO if o[0] != "Sessão / sinal"),
+    ),
+    # Próximos experts: copiar um bloco acima e trocar os dois IDs.
     # "belodi": ExpertConfig(slug="belodi", nome="Belodi", produto="Aviator",
     #     planilha_operacao_id="...", planilha_criativos_id="...",
     #     familias=FAMILIAS_PADRAO, producao_propria=_rx(r"^AD")),

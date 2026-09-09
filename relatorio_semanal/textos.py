@@ -222,6 +222,15 @@ def _alerta(a: Analise) -> tuple[str, list[str]]:
             itens.append(f"Concentração: {f.pct(share)} do investimento em {lider.familia} — risco de fadiga de formato.")
         if a.top10 and a.top10_com_ftd <= 3:
             itens.append(f"Só {a.top10_com_ftd} dos {len(a.top10)} maiores gastos geraram FTD.")
+        for g in a.por_sub:
+            share_g = g.investimento / a.aba.investimento if a.aba.investimento else 0
+            if share_g >= 0.15 and (g.ftd == 0 or cor_c_ftd(g.c_ftd, r) == "ruim"):
+                itens.append(
+                    f"{g.chave} leva {f.pct(share_g)} do investimento "
+                    + ("sem FTD atribuído." if g.ftd == 0 else f"a {f.brl(g.c_ftd)} por FTD.")
+                )
+        if a.cobertura and a.cobertura.atribuicao_furada:
+            itens.append(f"Só {f.pct(a.cobertura.pct_ftd_atribuido)} dos FTD têm criativo atribuído — ranking por peça é direção, não veredito.")
     if s.dias_com_gasto < s.dias_esperados:
         itens.append(f"Mídia rodou em {s.dias_com_gasto} de {s.dias_esperados} dias.")
     if not itens:
