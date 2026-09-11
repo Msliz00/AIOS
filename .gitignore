@@ -210,3 +210,7 @@ aios/config/config.yaml
 
 # ignore cerebrum
 Cerebrum/*
+
+# Google service account (nunca commitar)
+*.sa.json
+gcp-sa*.json
