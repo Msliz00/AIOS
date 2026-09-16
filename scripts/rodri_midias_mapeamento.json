@@ -1,0 +1,62 @@
+{
+  "_fonte": "FINALIZADOS RODRI NOVA REGULAMENTACAO (1-qfbrM3y_wuuVXQlU2i5atNWPzcZ343T)",
+  "_coletado_em": "2026-09-16",
+  "_metodo": "Apps Script DriveApp (varredura recursiva) - substitui o mapeamento anterior feito via conector, que tinha links duplicados/errados",
+  "_nota": "nomes no Drive usam '/' (31/ago); na planilha aparecem com '-' (31-ago)",
+
+  "CAIXINHA": {
+    "_id": "1ZyJZh3qhm8y6PHaicVrYPtBB-EnGoRwt",
+    "CXL_AD01_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/1CrhsPR3LOGUqurgnDlojqCu-YgGdo9Bq/view",
+    "CXL_AD01-compliance-31/ago.mp4": "https://drive.google.com/file/d/19Q_roMKZ3zpStXD7m8k7suU1SMrY2K2Z/view",
+    "CXL_AD02_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/1CEHxfzJeQfDjzx814GyAKDbIStRolJvZ/view",
+    "CXL_AD02-compliance-31/ago.mp4": "https://drive.google.com/file/d/1TU9VnKjWDUY0AdoQ6L6aE0tTj8POsWCT/view",
+    "CXL_AD03_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/15Ib0uShgoaJwjG_YIbQeGXePi64rtKc9/view",
+    "CXL_AD03-compliance-31/ago.mp4": "https://drive.google.com/file/d/1TA-a6IBYE1WzxBvq2VXHWqwVV-KSVjiU/view",
+    "CXL_AD04_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/1Tp6BvFzS1hO8GoOB3G96uS2cgj9yEtNb/view",
+    "CXL_AD04-compliance-31/ago.mp4": "https://drive.google.com/file/d/1GO0c3HafP0uKis8z8qj3XoYNn2vLzGO5/view",
+    "CXL_AD05_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/1kwHK-q6CCVU_coZ6CskjBL1Rw94eS3kX/view",
+    "CXL_AD05-compliance-31/ago.mp4": "https://drive.google.com/file/d/1WoHvev3eF7oK3OnY9vrtXJMzH5aW3gdF/view",
+    "CXL_AD06_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/1N2QK4n41sEKRHpaq7cSOGt6NVX_0IHOk/view",
+    "CXL_AD06-compliance-31/ago.mp4": "https://drive.google.com/file/d/1P9dCC5yPDpCNK6c3xL2mXPmgUi4p03OB/view",
+    "CXL_AD07_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/1QJOz8R-unlwMWOZ0pUjcZQIFBfiaqZQ6/view",
+    "CXL_AD07-compliance-31/ago.mp4": "https://drive.google.com/file/d/19bNBieNM0B6TjB9yr1Wz5FfqQc9UYei5/view",
+    "CXL_AD08_SL-compliance-31/ago.mp4": "https://drive.google.com/file/d/1j3BBxE-6TGX7dUjW6pntPzazKrrX9m9m/view",
+    "CXL_AD08-compliance-31/ago.mp4": "https://drive.google.com/file/d/1YNPARtpObqtAsFyk8oj6JxHKmFS6dCD0/view"
+  },
+
+  "AD 14 - GRAVACAO DE TELA 20X": {
+    "_id": "1Li4I1OYR-9gvYzvdevMz4I-p23cXaREH",
+    "AD14_CX01-compliance-31/ago.mp4": "https://drive.google.com/file/d/1yjyRe7z0TxIJv5t8cP_q2UpIUOXyVsY7/view",
+    "AD14_CX02-compliance-31/ago.mp4": "https://drive.google.com/file/d/1hFo1MDEps5zIuiSp4mm4SwROU2qgJtON/view",
+    "AD14_CX03-compliance-31/ago.mp4": "https://drive.google.com/file/d/1rwdQC5b9fBZ9GVkY5Wfn5E2zXSPX1GbI/view",
+    "AD14_CX04-compliance-31/ago.mp4": "https://drive.google.com/file/d/1hYIKoFyTl-ofwN-0p2FyGabx-tsQ9_yZ/view",
+    "AD14_CX05-compliance-31/ago.mp4": "https://drive.google.com/file/d/1qI8NzWitUme93Ci27tzSnt_qCt7otZYB/view",
+    "AD14_CX06-compliance-31/ago.mp4": "https://drive.google.com/file/d/1vm4A9wEXjxgPPY36_BUsHb6Xb6vrBElO/view",
+    "AD14_CX07-compliance-31/ago.mp4": "https://drive.google.com/file/d/15-1MWHM3td-guefOZLbEP4Tz0MHFKn2C/view",
+    "AD14_CX08-compliance-31/ago.mp4": "https://drive.google.com/file/d/1Pj5dTkSclIq3lLqUlLtURd0_Ph8Gdcag/view"
+  },
+
+  "AD 13 - GRAVACAO DE TELA - NARRACAO 100X - HOOK CAIXINHA": {
+    "_id": "14hMWsWHyqms2P7QF76Di0gDmZt0ty9og",
+    "AD13_HOOK_CX01-compliance-31/ago.mp4": "https://drive.google.com/file/d/1dJLHOQcdTp_Ru80sH1f-Zh8mdQhShS3C/view",
+    "AD13_HOOK_CX02-compliance-31/ago.mp4": "https://drive.google.com/file/d/1B-Jlmw_-0VtTMf_k_NbINWmtprAKqzQZ/view",
+    "AD13_HOOK_CX03-compliance-31/ago.mp4": "https://drive.google.com/file/d/1po2JB3i_Hk5K32tNozQzXyUv8VAkzENk/view",
+    "AD13_HOOK_CX04-compliance-31/ago.mp4": "https://drive.google.com/file/d/1PSZINM98yZWMSXCXsLot55L3UT5Ad-uC/view",
+    "AD13_HOOK_CX05-compliance-31/ago.mp4": "https://drive.google.com/file/d/1HwrIPoJdCH_g66VMtAMQ2OaQJyoax_zK/view",
+    "AD13_HOOK_CX06-compliance-31/ago.mp4": "https://drive.google.com/file/d/1KjPabpl2g7bQ8r1Gsz85CrJd6JZO6WR3/view",
+    "AD13_HOOK_CX07-compliance-31/ago.mp4": "https://drive.google.com/file/d/1I0oVdwdBODzQgWaX83rIX_72Eg817MeI/view",
+    "AD13_HOOK_CX08-compliance-31/ago.mp4": "https://drive.google.com/file/d/12ZBo52Et4eYwxFuc9JYRXzJsRw7B7iPr/view"
+  },
+
+  "AD 12 - GRAVACAO DE TELA - NARRACAO 50X": {
+    "_id": "19vOXBhE2H1qpt3R1-h0wRyLZjOVywhtl",
+    "AD12_HOOK_CX01-compliance-31/ago.mp4": "https://drive.google.com/file/d/1RsexVMgw22QY0wZKTSpF0r2l-hv7ejac/view",
+    "AD12_HOOK_CX02-compliance-31/ago.mp4": "https://drive.google.com/file/d/1KpZrId4KHY8GenA-kQlUGbW6TKqLI3_w/view",
+    "AD12_HOOK_CX03-compliance-31/ago.mp4": "https://drive.google.com/file/d/1jXmsyR7fkhNBxH0_wlylbZsuEDdQVmVK/view",
+    "AD12_HOOK_CX04-compliance-31/ago.mp4": "https://drive.google.com/file/d/1cgbL1UER8fC0nmQg3yXSYw4xOgmYRtW1/view",
+    "AD12_HOOK_CX05-compliance-31/ago.mp4": "https://drive.google.com/file/d/1jFq-H2UaCu01FzWo1L7wgnHz8g6mD3z3/view",
+    "AD12_HOOK_CX06-compliance-31/ago.mp4": "https://drive.google.com/file/d/12EFNFK5mHlgawRmcHj_XwUeq7wGkD-gD/view",
+    "AD12_HOOK_CX07-compliance-31/ago.mp4": "https://drive.google.com/file/d/1k3PAxBlEB5EDb7v-sCU19Gecn_bhg-9y/view",
+    "AD12_HOOK_CX08-compliance-31/ago.mp4": "https://drive.google.com/file/d/1Zw79yUO-qRb2rjPCowHjPyJCKYTfsw8R/view"
+  }
+}
