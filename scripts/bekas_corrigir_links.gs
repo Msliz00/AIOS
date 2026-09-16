@@ -15,6 +15,10 @@
  */
 
 // ===================== CONFIG =====================
+// ID da planilha BEKAS. Deixe preenchido para rodar de qualquer projeto
+// Apps Script. Se o script estiver vinculado a planilha, pode deixar ''.
+var ID_PLANILHA = '1IpISy5pq1vimkKGqx-KNfj3QX-CKg786vfSy6XW_l2g';
+
 // IDs das abas que o script pode alterar. Nada fora desta lista e tocado.
 var ABAS = [
   552723389,    // MEDIANO E EXCELENTE S36 · 31/08-06/09 -> MARQUES
@@ -88,7 +92,7 @@ function BEKAS_aplicar() { rodar(false); }
 
 function BEKAS_listarAbas() {
   var l = ['ABAS DESTA PLANILHA (nome -> ID):'];
-  SpreadsheetApp.getActive().getSheets().forEach(function (sh) {
+  planilha().getSheets().forEach(function (sh) {
     var alvo = ABAS.indexOf(sh.getSheetId()) >= 0;
     l.push('  ' + (alvo ? '[ALTERA]  ' : '[intacta] ') + sh.getSheetId() + '  ' + sh.getName());
   });
@@ -97,7 +101,7 @@ function BEKAS_listarAbas() {
 
 // ---------------------------------------------------------------- MOTOR
 function rodar(simular) {
-  var ss = SpreadsheetApp.getActive();
+  var ss = planilha();
 
   var mapa = {};
   for (var k in MAPA) mapa[chave(k)] = MAPA[k];
@@ -183,6 +187,13 @@ function rodar(simular) {
 }
 
 // ---------------------------------------------------------------- APOIO
+/** Abre a planilha pelo ID; cai para a planilha ativa se ID_PLANILHA estiver vazio. */
+function planilha() {
+  var ss = ID_PLANILHA ? SpreadsheetApp.openById(ID_PLANILHA) : SpreadsheetApp.getActive();
+  if (!ss) throw new Error('Planilha nao encontrada. Preencha ID_PLANILHA no topo do script.');
+  return ss;
+}
+
 /** Normaliza nomes: caixa, extensao, barra do Drive e espacos. */
 function chave(s) {
   return String(s || '').trim().toLowerCase()
