@@ -31,11 +31,18 @@ python3 pendente.py --bingo exp_bingo.csv --reals exp_reals.csv \
   --arquivo FECHAMENTO_FINAL_PENDENTE_DESDE_290626_ATE_160826.xlsx
 ```
 
-Sempre depois:
+Sempre depois — validar as fórmulas:
 ```bash
 python3 /mnt/skills/public/xlsx/scripts/recalc.py <arquivo.xlsx> 420   # esperar total_errors: 0
 ```
-(timeout 90 estoura no primeiro run — LibreOffice frio. Usar 420.)
+**Se o recalc estourar timeout mesmo com 420s**, o LibreOffice do container está quebrado
+(dá para confirmar: um xlsx de 3 células também estoura). Nesse caso use o validador local,
+que avalia as fórmulas em Python e reporta o mesmo `total_errors`:
+```bash
+pip install formulas
+python3 validar.py <arquivo.xlsx>                      # total_errors: 0
+python3 validar.py <arquivo.xlsx> --aba "VT UNIFICADO" --mostrar C21 F21
+```
 
 ## Regras de comissão (fixas)
 
