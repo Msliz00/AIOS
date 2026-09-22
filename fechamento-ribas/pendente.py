@@ -141,7 +141,7 @@ def main():
     inicio, fim = pd.Timestamp(a.inicio), pd.Timestamp(a.fim)
     if inicio.dayofweek != 0 or fim.dayofweek != 6 or (fim - inicio).days != 6:
         print(f"AVISO: semana esperada SEG->DOM; recebi {inicio:%a %d/%m} -> {fim:%a %d/%m}.")
-    periodo = f"{inicio:%d/%m} a {fim:%d/%m}"
+    periodo = f"{inicio:%d/%m/%y} ATÉ {fim:%d/%m/%y}"
     sem = _semana_label(inicio, fim)
 
     dados_b = {k: v for k, v in read_contas(a.bingo).items() if k not in EXCLUIDOS}

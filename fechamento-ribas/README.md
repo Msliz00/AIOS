@@ -44,6 +44,19 @@ python3 validar.py <arquivo.xlsx>                      # total_errors: 0
 python3 validar.py <arquivo.xlsx> --aba "VT UNIFICADO" --mostrar C21 F21
 ```
 
+## Auditar uma pasta de fechamentos (`auditar_datas.py`)
+
+Confere a **quantidade de material** por trilha e se o `DDMMAA` do **nome** bate com o
+último dia REAL de dado dentro de cada planilha (lê a coluna `DIA` no Jean/VT e a coluna
+`PERÍODO` nas abas semanais do pendente — nunca o título, que pode estar errado).
+Também aponta duplicatas e arquivos sem `_ATE_` no nome.
+
+```bash
+pip install openpyxl
+python3 auditar_datas.py "/caminho/da/pasta"             # só relata (dry-run)
+python3 auditar_datas.py "/caminho/da/pasta" --aplicar   # renomeia os errados
+```
+
 ## Regras de comissão (fixas)
 
 **BINGO** — CPA R$40/FTD + 35% RevShare.
