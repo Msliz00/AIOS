@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import re
+import hashlib
 import sys
 import unicodedata
 from collections import defaultdict
@@ -61,29 +62,74 @@ def datas_do_nome(nome: str) -> list[dt.date]:
     return out
 
 
-def checar_conteudo(caminho: Path) -> str:
-    """Confere se o export tem o que o pendente.py precisa."""
+def _num(v) -> float:
+    if v is None:
+        return 0.0
+    if isinstance(v, (int, float)):
+        return float(v)
+    t = str(v).strip().replace("R$", "").replace(" ", "")
+    if not t:
+        return 0.0
+    if "," in t and "." in t:
+        t = t.replace(".", "").replace(",", ".")
+    elif "," in t:
+        t = t.replace(",", ".")
+    try:
+        return float(t)
+    except ValueError:
+        return 0.0
+
+
+def checar_conteudo(caminho: Path) -> tuple[str, str, dict]:
+    """Confere o export e devolve (status, impressao digital, totais).
+
+    A impressao digital e o sha256 das linhas de dado (conta + FTD + NGR). Dois
+    arquivos com a mesma impressao carregam o MESMO dado, por mais diferentes
+    que sejam os nomes - e o jeito de pegar copia salva como semana nova.
+    """
+    vazio = {"contas": 0, "ftd": 0.0, "ngr": 0.0}
     try:
         wb = load_workbook(caminho, data_only=True, read_only=True)
     except Exception as e:
-        return f"nao abriu ({type(e).__name__})"
+        return f"nao abriu ({type(e).__name__})", "", vazio
     ws = wb.worksheets[0]
+
     cab = []
-    for row in ws.iter_rows(min_row=1, max_row=1):
-        cab = [_norm(c.value).replace(" ", "") for c in row]
+    for row in ws.iter_rows(min_row=1, max_row=1, values_only=True):
+        cab = [_norm(c).replace(" ", "") for c in row]
         break
-    linhas = ws.max_row
-    wb.close()
-    faltando = []
-    if not any(c.startswith("AFFILIATE") or c.startswith("BTAG") for c in cab):
-        faltando.append("Affiliate/BTAG")
-    if not any(c.startswith("FTD") for c in cab):
-        faltando.append("FTD")
-    if not any(c.startswith("NGR") for c in cab):
-        faltando.append("NGR")
+
+    def idx(*prefixos):
+        for i, c in enumerate(cab):
+            if any(c.startswith(pre) for pre in prefixos):
+                return i
+        return None
+
+    i_conta = idx("AFFILIATE", "BTAG")
+    i_ftd = idx("FTD")
+    i_ngr = idx("NGR")
+    faltando = [nome for nome, i in
+                (("Affiliate/BTAG", i_conta), ("FTD", i_ftd), ("NGR", i_ngr)) if i is None]
     if faltando:
-        return "FALTA " + ", ".join(faltando)
-    return f"ok ({max(linhas - 1, 0)} contas)"
+        wb.close()
+        return "FALTA " + ", ".join(faltando), "", vazio
+
+    h = hashlib.sha256()
+    contas = 0
+    tot_ftd = tot_ngr = 0.0
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if row[i_conta] in (None, ""):
+            continue
+        contas += 1
+        ftd, ngr = _num(row[i_ftd]), _num(row[i_ngr])
+        tot_ftd += ftd
+        tot_ngr += ngr
+        h.update(f"{str(row[i_conta]).strip()}|{ftd:.2f}|{ngr:.2f}\n".encode())
+    wb.close()
+
+    totais = {"contas": contas, "ftd": tot_ftd, "ngr": tot_ngr}
+    return (f"{contas} contas, {tot_ftd:.0f} FTD, NGR {tot_ngr:,.2f}",
+            h.hexdigest()[:12], totais)
 
 
 def semana_valida(ini: dt.date, fim: dt.date) -> list[str]:
@@ -171,9 +217,12 @@ def main():
                     problemas.append(f"SOBREPOE a semana anterior (que fecha {anterior:%d/%m/%y})")
             anterior = cf   # a cadeia segue pela semana CORRIGIDA, sem cascatear
 
-            conteudo = checar_conteudo(p)
-            marca = "OK " if not problemas and conteudo.startswith("ok") else "ERR"
-            print(f"  {marca} {ini:%d/%m/%y} -> {fim:%d/%m/%y}  [{conteudo}]  {p.name}")
+            conteudo, fp, _ = checar_conteudo(p)
+            it["fp"] = fp
+            ruim = conteudo.startswith(("nao abriu", "FALTA"))
+            marca = "OK " if not problemas and not ruim else "ERR"
+            print(f"  {marca} {ini:%d/%m/%y} -> {fim:%d/%m/%y}  [{conteudo}]  #{fp}")
+            print(f"      {p.name}")
             for pr in problemas:
                 print(f"        ! {pr}")
 
@@ -184,6 +233,23 @@ def main():
                 if novo != p.name:
                     print(f"        -> {novo}")
                     renomear.append((p, p.with_name(novo)))
+
+    print("\nCONTEUDO DUPLICADO ENTRE SEMANAS")
+    por_fp = defaultdict(list)
+    for it in itens:
+        if it.get("fp"):
+            por_fp[(it["plat"], it["fp"])].append(it)
+    achou_dup = False
+    for (plat, fp), grupo in sorted(por_fp.items(), key=lambda x: str(x[0])):
+        if len(grupo) > 1:
+            achou_dup = True
+            semanas = ", ".join(f"{g['ci']:%d/%m/%y}" for g in grupo)
+            print(f"  ERR {plat} #{fp}: MESMO DADO em {len(grupo)} semanas ({semanas})")
+            for g in grupo:
+                print(f"        - {g['path'].name}")
+            print("        -> uma delas e copia. NAO FECHE com esse arquivo.")
+    if not achou_dup:
+        print("  nenhuma semana repete o dado de outra")
 
     semanas_b = {(i["ci"], i["cf"]) for i in por_plat["BINGO"]}
     semanas_r = {(i["ci"], i["cf"]) for i in por_plat["REALS"]}
