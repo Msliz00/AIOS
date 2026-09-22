@@ -57,6 +57,23 @@ python3 auditar_datas.py "/caminho/da/pasta"             # só relata (dry-run)
 python3 auditar_datas.py "/caminho/da/pasta" --aplicar   # renomeia os errados
 ```
 
+## Auditar a pasta de EXPORTS semanais (`auditar_exports.py`)
+
+Os exports semanais (insumo do pendente) são **agregados por conta** — a coluna `Day`
+vem com o literal do ano, então **não existe data interna** para conferir. A única
+verdade de data é o nome do arquivo mais a regra da cadeia: SEG→DOM, emendando na
+semana anterior, sem buraco nem sobreposição.
+
+```bash
+python3 auditar_exports.py "/caminho/da/pasta"             # só relata
+python3 auditar_exports.py "/caminho/da/pasta" --aplicar   # corrige os nomes
+```
+
+Checa: dia da semana e intervalo de 7 dias · buracos e sobreposições na cadeia ·
+pareamento BINGO↔REALS semana a semana · se o arquivo abre e tem `Affiliate`/`FTD`/`NGR`
+(o que o `pendente.py` consome). Aceita data no nome como `DD:MM:AA` (o `/` do Finder
+vira `:` no disco), `DD/MM/AA`, `DD-MM-AA` ou `DD.MM.AAAA`.
+
 ## Regras de comissão (fixas)
 
 **BINGO** — CPA R$40/FTD + 35% RevShare.
