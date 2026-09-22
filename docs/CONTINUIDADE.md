@@ -1,6 +1,6 @@
 # CONTINUIDADE — IGAMING-MASTER-FLOW
 
-Ultima atualizacao: 2026-09-16
+Ultima atualizacao: 2026-09-22
 
 ---
 
@@ -55,6 +55,33 @@ errado. Dono: operador. Proximo passo: conferir o que entrou em campanha.
 A coluna A da aba MEDIANO E EXCELENTE foi pintada (verde = com link, vermelho = sem).
 Essa aba nao estava pintada antes e a pintura nao tinha sido pedida para ela.
 Dono: operador. Proximo passo: dizer se mantem ou se limpa.
+
+---
+
+## 1b. BEKAS S38 — links via CRIAS MARQUES  ✅ CONCLUIDO
+
+Aba: `S38 · 14–20/09 -> MARQUES`, gid **1229843098**
+Fonte: `CRIAS MARQUES - LINK` (`1Pt8vO6bClfRH4Gx5BbNkYJUTHhxtlpsv1haw3unlXJ4`), A = nome, C = link
+Conferencia: mapeamento do Drive (`18QuXwGwpkWiLd8CTojXdgOWN6j91U2J27A_5YCzH-yk`)
+Script: `scripts/bekas_s38_crias.gs`
+
+Resultado: 54 linhas, 54 com link. **100% preenchida.**
+40 preenchidos | 14 ja tinham | 0 protegidos | **0 sem correspondencia**
+
+### Decisoes tomadas
+- `PREFERIR_DRIVE = true`. A CRIAS carrega os mesmos file ids errados que ja tinham
+  sido corrigidos na MARQUES da S36, entao o link real do Drive vence. As 6 linhas
+  afetadas: C2 CXL_AD08_SL, C4 CXL_AD05, C32 CXL_AD02_SL, C45 CXL_AD03,
+  C48 CXL_AD04, C55 CXL_AD03_SL.
+- Aba identificada por gid, nao por nome.
+- Casamento de nome em duas passadas (normalizado e so-alfanumerico). A segunda nunca
+  foi exercida: a nomenclatura da CRIAS e da BEKAS bate 100% na forma exata.
+
+### ⚠️ A CRIAS MARQUES continua com os 6 links errados
+Corrigimos o destino, nao a origem. A proxima semana que puxar da CRIAS sem o
+`PREFERIR_DRIVE` herda o erro de novo.
+Dono: operador. Proximo passo: corrigir a coluna C da CRIAS, ou manter
+`PREFERIR_DRIVE = true` como padrao em toda execucao futura.
 
 ---
 
