@@ -31,6 +31,12 @@ try:
 except ImportError:
     sys.exit("faltou: pip install openpyxl")
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from roster import BINGO as ROSTER_BINGO, REALS as ROSTER_REALS
+
+ROSTER = {"BINGO": {b for b, *_ in ROSTER_BINGO},
+          "REALS": {b for b, _ in ROSTER_REALS}}
+
 # aceita 14:09:26, 14/09/26, 14-09-26, 14.09.2026
 DATA_RE = re.compile(r"\b(\d{1,2})[:/.\-](\d{1,2})[:/.\-](\d{2,4})\b")
 DIAS = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"]
@@ -80,7 +86,7 @@ def _num(v) -> float:
         return 0.0
 
 
-def checar_conteudo(caminho: Path) -> tuple[str, str, dict]:
+def checar_conteudo(caminho: Path, plat: str = "") -> tuple[str, str, dict]:
     """Confere o export e devolve (status, impressao digital, totais).
 
     A impressao digital e o sha256 das linhas de dado (conta + FTD + NGR). Dois
@@ -114,21 +120,30 @@ def checar_conteudo(caminho: Path) -> tuple[str, str, dict]:
         wb.close()
         return "FALTA " + ", ".join(faltando), "", vazio
 
+    alvo = ROSTER.get(plat, set())
     h = hashlib.sha256()
-    contas = 0
-    tot_ftd = tot_ngr = 0.0
+    contas = r_contas = 0
+    tot_ftd = tot_ngr = r_ftd = r_ngr = 0.0
     for row in ws.iter_rows(min_row=2, values_only=True):
         if row[i_conta] in (None, ""):
             continue
+        conta = re.sub(r"\D", "", str(row[i_conta])) or str(row[i_conta]).strip()
         contas += 1
         ftd, ngr = _num(row[i_ftd]), _num(row[i_ngr])
         tot_ftd += ftd
         tot_ngr += ngr
-        h.update(f"{str(row[i_conta]).strip()}|{ftd:.2f}|{ngr:.2f}\n".encode())
+        if conta in alvo:          # so o que entra no fechamento
+            r_contas += 1
+            r_ftd += ftd
+            r_ngr += ngr
+        h.update(f"{conta}|{ftd:.2f}|{ngr:.2f}\n".encode())
     wb.close()
 
-    totais = {"contas": contas, "ftd": tot_ftd, "ngr": tot_ngr}
-    return (f"{contas} contas, {tot_ftd:.0f} FTD, NGR {tot_ngr:,.2f}",
+    totais = {"contas": contas, "ftd": tot_ftd, "ngr": tot_ngr,
+              "r_contas": r_contas, "r_ftd": r_ftd, "r_ngr": r_ngr}
+    # o total da planilha e da plataforma inteira; o que fecha comissao e o roster
+    return (f"roster {r_contas}/{len(alvo)}: {r_ftd:.0f} FTD, NGR {r_ngr:,.2f}"
+            f"  (planilha inteira: {contas} contas, NGR {tot_ngr:,.2f})",
             h.hexdigest()[:12], totais)
 
 
@@ -217,7 +232,7 @@ def main():
                     problemas.append(f"SOBREPOE a semana anterior (que fecha {anterior:%d/%m/%y})")
             anterior = cf   # a cadeia segue pela semana CORRIGIDA, sem cascatear
 
-            conteudo, fp, _ = checar_conteudo(p)
+            conteudo, fp, _ = checar_conteudo(p, plat)
             it["fp"] = fp
             ruim = conteudo.startswith(("nao abriu", "FALTA"))
             marca = "OK " if not problemas and not ruim else "ERR"
