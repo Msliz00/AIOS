@@ -23,12 +23,12 @@ var ID_CRIAS = '1Pt8vO6bClfRH4Gx5BbNkYJUTHhxtlpsv1haw3unlXJ4';
 var ID_MAPA_DRIVE = '18QuXwGwpkWiLd8CTojXdgOWN6j91U2J27A_5YCzH-yk';
 
 // Aba de destino na BEKAS. Se souber o ID (gid), preencha e o nome e ignorado.
-var ID_ABA_S38 = 0;
+var ID_ABA_S38 = 1229843098;
 var NOME_ABA_S38 = 'S38 · 14–20/09 -> MARQUES';
 
 // Quando a CRIAS e o Drive discordam: false usa a CRIAS (o que voce pediu),
 // true usa o link real do Drive.
-var PREFERIR_DRIVE = false;
+var PREFERIR_DRIVE = true;
 
 // Colunas
 var COL_NOME = 1;   // A nas duas planilhas
