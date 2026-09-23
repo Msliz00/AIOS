@@ -74,6 +74,27 @@ pareamento BINGO↔REALS semana a semana · se o arquivo abre e tem `Affiliate`/
 (o que o `pendente.py` consome). Aceita data no nome como `DD:MM:AA` (o `/` do Finder
 vira `:` no disco), `DD/MM/AA`, `DD-MM-AA` ou `DD.MM.AAAA`.
 
+## Forense de data (`forense_exports.py`)
+
+Quando o nome de um export é suspeito, este levanta toda a evidência que existe
+e não deduz nada: mtime e birthtime do disco, `docProps/created` de dentro do
+xlsx, tamanho, contas/FTD/NGR (roster e planilha inteira) e a impressão digital
+do dado. Depois responde:
+
+- **A** — varre todas as partes do zip (inclusive `sharedStrings.xml`) atrás de
+  período interno; nesses exports não há, e o relatório diz isso.
+- **B/C** — ordena por `docProps/created` e confronta com a ordem cronológica
+  das semanas que os nomes afirmam. Timestamps todos iguais (download em lote)
+  saem como INDETERMINADO, nunca como erro.
+- **D/E** — acha semanas com dado idêntico e, com `--procurar-em`, caça em
+  outras pastas o arquivo de origem de onde a cópia veio.
+
+```bash
+python3 forense_exports.py "/caminho/da/pasta" --procurar-em ~/Downloads ~/Desktop
+```
+
+Só lê: não renomeia, não move, não apaga.
+
 ## Regras de comissão (fixas)
 
 **BINGO** — CPA R$40/FTD + 35% RevShare.
