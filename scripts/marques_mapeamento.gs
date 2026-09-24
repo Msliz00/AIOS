@@ -154,7 +154,7 @@ function motor(reiniciar) {
     log.push('', '>>> PAROU NO TEMPO. Rode MAPEAR_continuar (botao EXECUTAR). <<<',
                  'Nada foi perdido: retoma exatamente de onde parou.');
     Logger.log(log.join('\n'));
-    ss.toast('Faltam ' + pend + ' pastas. Rode MAPEAR_continuar.', 'MAPEAMENTO', 10);
+    try { ss.toast('Faltam ' + pend + ' pastas. Rode MAPEAR_continuar.', 'MAPEAMENTO', 10); } catch (e) {}
     return;
   }
 
@@ -248,7 +248,8 @@ function consolidar(ss) {
     '======================================================'
   ].join('\n'));
 
-  ss.toast(total + ' arquivos | ' + cortes.length + ' cortes ' + MIN_X + 'x+', 'PRONTO', 15);
+  // toast so existe em script vinculado a planilha; num projeto avulso ele lanca.
+  try { ss.toast(total + ' arquivos | ' + cortes.length + ' cortes ' + MIN_X + 'x+', 'PRONTO', 15); } catch (e) {}
 }
 
 function escrever(ss, nome, cab, linhas) {
