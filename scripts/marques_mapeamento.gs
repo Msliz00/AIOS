@@ -262,15 +262,38 @@ function escrever(ss, nome, cab, linhas) {
 }
 
 // ---------------------------------------------------------------- APOIO
-/** "corte" no nome E algum numero seguido de x com valor >= MIN_X. */
-function ehCorte(nome) {
-  var n = String(nome || '').toLowerCase();
-  if (n.indexOf('corte') < 0) return false;
-  var re = /(\d+)\s*x/g, m;
-  while ((m = re.exec(n)) !== null) {
-    if (parseInt(m[1], 10) >= MIN_X) return true;
+/**
+ * Converte o texto antes do "x" em numero, aceitando numero quebrado.
+ *   "100"      -> 100        "100,5"  -> 100.5
+ *   "1.000"    -> 1000       "1.234,5"-> 1234.5
+ * Ponto so vira separador de milhar quando os grupos tem 3 digitos,
+ * senao e decimal: "100.5" -> 100.5.
+ */
+function valorNum(tok) {
+  var s = String(tok || '').replace(/[^\d.,]/g, '');
+  if (!s) return null;
+  if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))      s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) s = s.replace(/,/g, '');
+  else                                            s = s.replace(',', '.');
+  var v = parseFloat(s);
+  return isNaN(v) ? null : v;
+}
+
+/** Maior multiplicador "<numero>x" do nome, ou null se nao houver. */
+function maiorMultiplicador(nome) {
+  var re = /(\d[\d.,]*)\s*x/gi, m, maior = null;
+  while ((m = re.exec(String(nome || ''))) !== null) {
+    var v = valorNum(m[1]);
+    if (v !== null && (maior === null || v > maior)) maior = v;
   }
-  return false;
+  return maior;
+}
+
+/** "corte" no nome E multiplicador >= MIN_X. */
+function ehCorte(nome) {
+  if (String(nome || '').toLowerCase().indexOf('corte') < 0) return false;
+  var v = maiorMultiplicador(nome);
+  return v !== null && v >= MIN_X;
 }
 
 function chave(s) {
