@@ -1,21 +1,19 @@
 /**
- * Mapeia 100% das midias das pastas listadas em PASTAS_RAIZ e de todas as
- * subpastas delas, em qualquer profundidade.
+ * Mapeia 100% das midias das pastas em PASTAS_RAIZ e de todas as subpastas.
  *
  * Gera uma planilha com 3 abas:
  *   MIDIAS UNICAS      - nome que aparece uma unica vez
  *   MIDIAS DUPLICADAS  - nome repetido, uma linha por nome
  *   CORTE 50X+         - nome com "corte" e algum multiplicador >= 50
  *
- * A varredura para sozinha antes dos 6 minutos e salva o progresso.
- * Se o log pedir, rode MAPEAR_continuar quantas vezes precisar.
+ * A varredura para sozinha antes do limite de 6 min e salva onde parou,
+ * inclusive NO MEIO de uma pasta grande (continuation token do DriveApp).
  *
  * COMO USAR
  *   1. script.google.com > Novo projeto
  *   2. Colar este arquivo e salvar (Ctrl+S)
- *   3. Rodar MAPEAR_iniciar
+ *   3. Rodar MAPEAR_iniciar   -- pelo botao EXECUTAR, nunca por Depuracao
  *   4. Enquanto o log pedir, rodar MAPEAR_continuar
- *   Resultado em Execucoes > Registros.
  */
 
 // ===================== CONFIG =====================
@@ -31,15 +29,17 @@ var SOMENTE_MIDIA = true;
 // Multiplicador minimo para a aba CORTE. 50 = pega 50x, 100x, 200x...
 var MIN_X = 50;
 
-// Para a varredura antes do limite de 6 min do Apps Script.
-var LIMITE_MS = 4.5 * 60 * 1000;
+// Para a varredura com folga sobre o limite de 6 min do Apps Script.
+var LIMITE_MS = 4 * 60 * 1000;
 
-// Profundidade maxima de subpastas.
+// Descarrega o acumulado a cada N arquivos, para nao perder trabalho.
+var LOTE = 300;
+
 var NIVEL_MAX = 12;
 // ==================================================
 
-function MAPEAR_iniciar()   { motor(true); }
-function MAPEAR_continuar()  { motor(false); }
+function MAPEAR_iniciar()  { motor(true); }
+function MAPEAR_continuar() { motor(false); }
 
 /** Refaz so as 3 abas finais a partir do que ja foi varrido. */
 function MAPEAR_consolidar() {
@@ -55,6 +55,7 @@ function MAPEAR_zerar() {
 }
 
 // ---------------------------------------------------------------- MOTOR
+// _FILA: A=ID  B=CAMINHO  C=STATUS(P|OK|ERRO)  D=NIVEL  E=TOKEN('' | <token> | FIM)
 function motor(reiniciar) {
   var t0 = Date.now();
   var props = PropertiesService.getScriptProperties();
@@ -66,18 +67,17 @@ function motor(reiniciar) {
 
     var f = ss.getSheets()[0];
     f.setName('_FILA');
-    f.getRange(1, 1, 1, 4).setValues([['ID', 'CAMINHO', 'STATUS', 'NIVEL']]);
-
+    f.getRange(1, 1, 1, 5).setValues([['ID', 'CAMINHO', 'STATUS', 'NIVEL', 'TOKEN']]);
     var raizes = PASTAS_RAIZ.map(function (id) {
-      return [id, DriveApp.getFolderById(id).getName(), 'P', 0];
+      return [id, DriveApp.getFolderById(id).getName(), 'P', 0, ''];
     });
-    f.getRange(2, 1, raizes.length, 4).setValues(raizes);
-    Logger.log('Pastas raiz:\n  ' + raizes.map(function (r) { return r[1]; }).join('\n  ') + '\n');
+    f.getRange(2, 1, raizes.length, 5).setValues(raizes);
 
     var b = ss.insertSheet('_BRUTO');
     b.getRange(1, 1, 1, 4).setValues([['NOME', 'LINK', 'PASTA', 'FILEID']]);
 
-    Logger.log('Planilha criada:\n' + ss.getUrl() + '\n');
+    Logger.log('Pastas raiz:\n  ' + raizes.map(function (r) { return r[1]; }).join('\n  ')
+             + '\n\nPlanilha criada:\n' + ss.getUrl() + '\n');
   } else {
     var id = props.getProperty('ssId');
     if (!id) { Logger.log('Nada para continuar. Rode MAPEAR_iniciar.'); return; }
@@ -87,11 +87,12 @@ function motor(reiniciar) {
   var shFila = ss.getSheetByName('_FILA');
   var shBruto = ss.getSheetByName('_BRUTO');
   var fila = shFila.getLastRow() > 1
-    ? shFila.getRange(2, 1, shFila.getLastRow() - 1, 4).getValues() : [];
+    ? shFila.getRange(2, 1, shFila.getLastRow() - 1, 5).getValues() : [];
 
-  var buffer = [], feitas = 0, ignorados = 0, erros = 0, estourou = false;
+  var ctx = { buffer: [], shBruto: shBruto, shFila: shFila, fila: fila };
+  var feitas = 0, achados = 0, ignorados = 0, erros = 0, estourou = false;
 
-  // fila cresce dentro do proprio laco: percorre em largura
+  // a fila cresce dentro do proprio laco: percorre em largura
   for (var i = 0; i < fila.length; i++) {
     if (fila[i][2] !== 'P') continue;
     if (Date.now() - t0 > LIMITE_MS) { estourou = true; break; }
@@ -101,39 +102,57 @@ function motor(reiniciar) {
     catch (e) { fila[i][2] = 'ERRO'; erros++; continue; }
 
     var caminho = fila[i][1], nivel = Number(fila[i][3]) || 0;
+    var tk = String(fila[i][4] || '');
 
-    var arq = pasta.getFiles();
-    while (arq.hasNext()) {
-      var a = arq.next(), mt = a.getMimeType();
-      if (mt === 'application/vnd.google-apps.shortcut') { ignorados++; continue; }
-      if (SOMENTE_MIDIA && mt.indexOf('video/') !== 0 && mt.indexOf('image/') !== 0) { ignorados++; continue; }
-      buffer.push([a.getName(), a.getUrl(), caminho, a.getId()]);
+    // ---- arquivos, retomaveis no meio
+    if (tk !== 'FIM') {
+      var arq = tk ? DriveApp.continueFileIterator(tk) : pasta.getFiles();
+      while (arq.hasNext()) {
+        if (Date.now() - t0 > LIMITE_MS) {
+          fila[i][4] = arq.getContinuationToken();   // status segue 'P'
+          estourou = true;
+          break;
+        }
+        var a = arq.next(), mt = a.getMimeType();
+        if (mt === 'application/vnd.google-apps.shortcut') { ignorados++; continue; }
+        if (SOMENTE_MIDIA && mt.indexOf('video/') !== 0 && mt.indexOf('image/') !== 0) { ignorados++; continue; }
+        ctx.buffer.push([a.getName(), 'https://drive.google.com/file/d/' + a.getId() + '/view',
+                         caminho, a.getId()]);
+        achados++;
+        if (ctx.buffer.length >= LOTE) salvar(ctx);
+      }
+      if (estourou) break;
+      fila[i][4] = 'FIM';
     }
 
+    // ---- subpastas
     if (nivel < NIVEL_MAX) {
       var subs = pasta.getFolders();
       while (subs.hasNext()) {
         var s = subs.next();
-        fila.push([s.getId(), caminho + ' / ' + s.getName(), 'P', nivel + 1]);
+        fila.push([s.getId(), caminho + ' / ' + s.getName(), 'P', nivel + 1, '']);
       }
     }
 
     fila[i][2] = 'OK';
     feitas++;
-    if (feitas % 10 === 0) { buffer = salvar(shBruto, shFila, buffer, fila); }
+    if (feitas % 5 === 0) salvar(ctx);
   }
 
-  salvar(shBruto, shFila, buffer, fila);
+  salvar(ctx);
 
   var pend = fila.filter(function (r) { return r[2] === 'P'; }).length;
-  var log = ['Pastas varridas nesta execucao: ' + feitas,
+  var log = ['Pastas concluidas nesta execucao: ' + feitas,
              'Pastas ainda na fila: ' + pend,
-             'Arquivos coletados ate agora: ' + Math.max(0, shBruto.getLastRow() - 1),
+             'Arquivos achados nesta execucao: ' + achados,
+             'Arquivos no total ate agora: ' + Math.max(0, shBruto.getLastRow() - 1),
              'Ignorados nesta execucao (atalho ou nao-midia): ' + ignorados,
-             'Pastas com erro de acesso: ' + erros];
+             'Pastas sem acesso: ' + erros,
+             'Tempo usado: ' + Math.round((Date.now() - t0) / 1000) + 's'];
 
   if (estourou || pend) {
-    log.push('', '>>> PAROU NO LIMITE DE TEMPO. Rode MAPEAR_continuar. <<<');
+    log.push('', '>>> PAROU NO TEMPO. Rode MAPEAR_continuar (botao EXECUTAR). <<<',
+                 'Nada foi perdido: retoma exatamente de onde parou.');
     Logger.log(log.join('\n'));
     ss.toast('Faltam ' + pend + ' pastas. Rode MAPEAR_continuar.', 'MAPEAMENTO', 10);
     return;
@@ -144,15 +163,16 @@ function motor(reiniciar) {
   consolidar(ss);
 }
 
-function salvar(shBruto, shFila, buffer, fila) {
-  if (buffer.length) {
-    shBruto.getRange(shBruto.getLastRow() + 1, 1, buffer.length, 4).setValues(buffer);
+function salvar(ctx) {
+  if (ctx.buffer.length) {
+    ctx.shBruto.getRange(ctx.shBruto.getLastRow() + 1, 1, ctx.buffer.length, 4)
+       .setValues(ctx.buffer);
+    ctx.buffer.length = 0;
   }
-  if (fila.length) {
-    shFila.getRange(2, 1, fila.length, 4).setValues(fila);
+  if (ctx.fila.length) {
+    ctx.shFila.getRange(2, 1, ctx.fila.length, 5).setValues(ctx.fila);
   }
   SpreadsheetApp.flush();
-  return [];
 }
 
 // ---------------------------------------------------------------- SAIDA
@@ -207,28 +227,28 @@ function consolidar(ss) {
     if (sh) sh.hideSheet();
   });
 
-  var totalArquivos = ordemId.length;
+  var total = ordemId.length;
   var emDups = dups.reduce(function (s, r) { return s + r[2]; }, 0);
 
   Logger.log([
     '',
     '================ MAPEAMENTO CONCLUIDO ================',
-    'Arquivos distintos encontrados: ' + totalArquivos,
-    'Nomes distintos: ' + ordemNome.length,
+    'Arquivos distintos: ' + total,
+    'Nomes distintos:    ' + ordemNome.length,
     '',
     '  MIDIAS UNICAS:     ' + unicas.length + ' nomes',
-    '  MIDIAS DUPLICADAS: ' + dups.length + ' nomes  (' + emDups + ' arquivos no total)',
+    '  MIDIAS DUPLICADAS: ' + dups.length + ' nomes  (' + emDups + ' arquivos)',
     '  CORTE ' + MIN_X + 'X+:        ' + cortes.length + ' midias',
     '',
     'Conferencia: ' + unicas.length + ' + ' + emDups + ' = ' + (unicas.length + emDups)
-      + (unicas.length + emDups === totalArquivos ? '  OK, bate com o total.' : '  ATENCAO: nao bate.'),
+      + (unicas.length + emDups === total ? '  OK, bate com o total.' : '  ATENCAO: nao bate.'),
     '',
     'PLANILHA:',
     ss.getUrl(),
     '======================================================'
   ].join('\n'));
 
-  ss.toast(totalArquivos + ' arquivos | ' + cortes.length + ' cortes ' + MIN_X + 'x+', 'PRONTO', 15);
+  ss.toast(total + ' arquivos | ' + cortes.length + ' cortes ' + MIN_X + 'x+', 'PRONTO', 15);
 }
 
 function escrever(ss, nome, cab, linhas) {
