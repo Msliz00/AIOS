@@ -1,5 +1,6 @@
 /**
- * Mapeia 100% das midias de todas as subpastas de "6 - Operacao: Marques (Aviator)".
+ * Mapeia 100% das midias das pastas listadas em PASTAS_RAIZ e de todas as
+ * subpastas delas, em qualquer profundidade.
  *
  * Gera uma planilha com 3 abas:
  *   MIDIAS UNICAS      - nome que aparece uma unica vez
@@ -18,8 +19,11 @@
  */
 
 // ===================== CONFIG =====================
-var ID_PASTA_RAIZ = '1TIdIapgcIawzQpwvAObFjkud19ITFGk7';
-var NOME_SAIDA = 'MAPEAMENTO MARQUES (AVIATOR)';
+var PASTAS_RAIZ = [
+  '1cKjcPoXg33Iop5irkdTprSLY_2hT89v7',   // CORTES LIVES
+  '1-ktfQQaL-Ss_CA6gN4-ZE50oJXj1lGSf'    // CONTEUDOS - Marques Av
+];
+var NOME_SAIDA = 'MAPEAMENTO CORTES LIVES + CONTEUDOS';
 
 // true = so video e imagem. false = todo arquivo que nao seja atalho ou pasta.
 var SOMENTE_MIDIA = true;
@@ -57,14 +61,18 @@ function motor(reiniciar) {
   var ss;
 
   if (reiniciar) {
-    var raiz = DriveApp.getFolderById(ID_PASTA_RAIZ);
     ss = SpreadsheetApp.create(NOME_SAIDA + ' - ' + hoje());
     props.setProperty('ssId', ss.getId());
 
     var f = ss.getSheets()[0];
     f.setName('_FILA');
     f.getRange(1, 1, 1, 4).setValues([['ID', 'CAMINHO', 'STATUS', 'NIVEL']]);
-    f.appendRow([ID_PASTA_RAIZ, raiz.getName(), 'P', 0]);
+
+    var raizes = PASTAS_RAIZ.map(function (id) {
+      return [id, DriveApp.getFolderById(id).getName(), 'P', 0];
+    });
+    f.getRange(2, 1, raizes.length, 4).setValues(raizes);
+    Logger.log('Pastas raiz:\n  ' + raizes.map(function (r) { return r[1]; }).join('\n  ') + '\n');
 
     var b = ss.insertSheet('_BRUTO');
     b.getRange(1, 1, 1, 4).setValues([['NOME', 'LINK', 'PASTA', 'FILEID']]);
