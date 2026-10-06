@@ -1,6 +1,7 @@
 # PROJETO DESAPEGO — marketplace em grupos
 
 Criado: 2026-10-06
+Atualizado: 2026-10-06
 Status: Fase 1 (fundacao) — nao iniciada
 
 ---
@@ -76,6 +77,88 @@ moderacao. Entra quando o custo marginal for zero.
 
 ---
 
+## PROGRAMA DE INDICACAO — credito, nao sorteio
+
+### Por que nao sorteio
+Lei 5.768/1971: distribuicao gratuita de premios mediante sorteio depende de
+autorizacao previa da SPA/MF. A Portaria SPA/MF 1.818/2026 regulamentou o regime
+sancionador, entao a fiscalizacao apertou. Multa chega a 100% do valor dos premios.
+
+Chamar de concurso cultural nao resolve: a isencao vale so para concurso
+*exclusivamente* cultural, julgado por merito intelectual. Ranking de indicacoes e
+desempenho, nao criatividade — cai na mesma lei.
+
+### Por que credito e melhor, alem da lei
+
+| | Sorteio | Credito |
+|---|---|---|
+| Autorizacao | SPA/MF, prazo e taxa | nenhuma |
+| Recompensa | probabilistica | imediata e certa |
+| Destino do dinheiro | sai da operacao | volta para dentro |
+| Retencao | zero apos o sorteio | credito so vale aqui |
+
+O credito resgatavel so na plataforma alimenta a camada 1: o indicador ganha R$10 e
+gasta em taxa de publicacao ou destaque.
+
+### Mecanica
+- Indicou -> o indicado publica o PRIMEIRO ANUNCIO -> os dois ganham credito
+- Gatilho e o anuncio, nao o cadastro. Cadastro e vaidade, anuncio e inventario.
+- **Trava anti-fraude:** credito so libera quando o anuncio do indicado passa no
+  score minimo. Sem isso, paga-se por conta fantasma com foto tirada da internet.
+
+Sorteio fica para depois, com autorizacao, dimensionado pelos numeros do piloto.
+
+---
+
+## ESTRUTURA DE AVALIACAO AUTOMATICA (bot)
+
+E o mecanismo que transforma volume em qualidade. Anuncio ruim nao e bloqueado,
+e enterrado no feed — o vendedor aprende sozinho.
+
+### Camada A — score do anuncio (0-100), calculado na publicacao
+
+| Criterio | Peso | Verificacao do bot |
+|---|---|---|
+| Fotos (quantidade, nitidez, fundo) | 30 | visao computacional |
+| Descricao completa | 20 | campos e contagem de caracteres |
+| Preco vs mediana da categoria | 25 | historico do banco |
+| Estado declarado + evidencia | 15 | foto confere com o estado |
+| Dados de entrega/retirada | 10 | campos preenchidos |
+
+### Camada B — classificacao de estado
+Menu fechado no bot, nunca texto livre:
+`Novo lacrado` · `Seminovo` · `Usado — bom` · `Usado — com marcas` · `Com defeito`
+
+### Camada C — score do vendedor
+Vendas concluidas, avaliacao do comprador, disputas abertas, tempo de resposta.
+
+### Ordem do feed
+score do anuncio x score do vendedor x recencia
+
+---
+
+## NOMES CANDIDATOS (verificados por DNS em 06/10/2026)
+
+"sem DNS" sugere disponivel mas nao garante: no .com.br muitos dominios ficam
+registrados sem site. Confirmar no registro.br antes de comprar.
+
+| Nome | .com.br | .com | Observacao |
+|---|---|---|---|
+| **REVIRA** | sem DNS | tomado | recomendado: aceita submarca por categoria |
+| USADIN | sem DNS | sem DNS | direto, mas desvaloriza ticket alto |
+| VIRALEVE | sem DNS | sem DNS | aspiracional, nao diz o que e |
+| PASSA ADIANTE | sem DNS | sem DNS | cultural, 12 caracteres |
+| GARIMPEI | sem DNS | tomado | fala so com o comprador |
+
+REVIRA e o recomendado porque o recorte do projeto e por categoria, e so ele
+suporta submarca sem travar: Revira Tech, Revira Baby, Revira Casa, Revira
+Ferramentas.
+
+Pendente de checagem manual (o proxy desta sessao bloqueia t.me e o Instagram
+exige login): @ no Instagram, @ no Telegram, marca no INPI classe 35.
+
+---
+
 ## ORDEM DE EXECUCAO
 
 | Fase | Entrega | Estado |
@@ -115,7 +198,7 @@ Sem esses numeros nao se decide nada na fase 3:
 
 ## PENDENTE DE DEFINICAO
 
-- Nome e identidade da marca
+- Escolher entre os 5 candidatos e checar @ no Instagram/Telegram e marca no INPI
 - Percentual da comissao e valor da taxa de publicacao
 - Gateway escolhido
 - Regiao de atuacao (nacional ou recorte)
