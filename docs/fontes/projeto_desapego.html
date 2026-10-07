@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Projeto Desapego</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 14mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 9.4pt; line-height: 1.5;
+         color: #1c2025; margin: 0; }
+  h1 { font-size: 21pt; margin: 0 0 4px; letter-spacing: -.4px; }
+  h2 { font-size: 13pt; margin: 22px 0 8px; padding-bottom: 5px;
+       border-bottom: 2px solid #0f766e; color: #0f766e; page-break-after: avoid; }
+  h3 { font-size: 10.4pt; margin: 14px 0 5px; color: #134e4a; page-break-after: avoid; }
+  p  { margin: 0 0 7px; }
+  ul, ol { margin: 0 0 8px; padding-left: 17px; }
+  li { margin-bottom: 3px; }
+  table { width: 100%; border-collapse: collapse; margin: 7px 0 11px; font-size: 8.7pt;
+          page-break-inside: avoid; }
+  th { background: #0f766e; color: #fff; text-align: left; padding: 5px 7px; font-weight: bold; }
+  td { border-bottom: 1px solid #dde3e2; padding: 5px 7px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f9f8; }
+  .capa { text-align: center; padding: 55mm 0 0; page-break-after: always; }
+  .capa h1 { font-size: 34pt; color: #0f766e; }
+  .capa .sub { font-size: 12.5pt; color: #51606b; margin-top: 10px; }
+  .capa .meta { margin-top: 42mm; font-size: 9pt; color: #78858f; line-height: 1.9; }
+  .capa .tag { display: inline-block; background: #0f766e; color: #fff; padding: 5px 16px;
+               border-radius: 20px; font-size: 8.5pt; letter-spacing: 1.4px; margin-bottom: 20px; }
+  .pg { page-break-before: always; }
+  .box { border-left: 3px solid #0f766e; background: #f2f8f7; padding: 9px 12px; margin: 9px 0 12px; }
+  .alerta { border-left: 3px solid #b45309; background: #fef6ec; padding: 9px 12px; margin: 9px 0 12px; }
+  .alerta b { color: #92400e; }
+  .ok { border-left: 3px solid #15803d; background: #f1f9f3; padding: 9px 12px; margin: 9px 0 12px; }
+  .mono { font-family: "Courier New", monospace; font-size: 8.4pt; background: #f4f6f6;
+          border: 1px solid #e2e8e7; padding: 9px 11px; margin: 8px 0 11px; white-space: pre-wrap;
+          page-break-inside: avoid; }
+  .peq { font-size: 8pt; color: #6b7780; }
+  .fase { display: inline-block; background: #0f766e; color: #fff; width: 19px; height: 19px;
+          border-radius: 50%; text-align: center; line-height: 19px; font-size: 8.5pt;
+          font-weight: bold; margin-right: 6px; }
+  .rec { background: #e8f4f2 !important; font-weight: bold; }
+  .grid { display: table; width: 100%; margin: 8px 0 12px; }
+  .col { display: table-cell; width: 50%; padding-right: 11px; vertical-align: top; }
+  .col:last-child { padding-right: 0; padding-left: 11px; }
+  .kpi { border: 1px solid #dde3e2; border-top: 3px solid #0f766e; padding: 8px 10px; margin-bottom: 7px; }
+  .kpi .n { font-size: 15pt; font-weight: bold; color: #0f766e; }
+  .kpi .l { font-size: 7.8pt; color: #6b7780; text-transform: uppercase; letter-spacing: .5px; }
+  .ck { list-style: none; padding-left: 0; }
+  .ck li { padding-left: 19px; position: relative; margin-bottom: 5px; }
+  .ck li:before { content: "☐"; position: absolute; left: 0; font-size: 11pt; color: #0f766e; }
+</style></head><body>
+
+<div class="capa">
+  <div class="tag">PLANEJAMENTO OPERACIONAL</div>
+  <h1>PROJETO DESAPEGO</h1>
+  <div class="sub">Marketplace de usados em grupos<br>WhatsApp &amp; Telegram</div>
+  <div class="meta">
+    IGAMING-MASTER-FLOW · 00BABY<br>
+    Versão 1.0 — 07 de outubro de 2026<br>
+    Status: Fase 1 (Fundação) — não iniciada
+  </div>
+</div>
+
+<h2>1. Sumário executivo</h2>
+<p>Marketplace de produtos usados operado dentro de grupos de mensageria, com receita por
+comissão sobre a transação. O diferencial não é o grupo — grupo qualquer um cria. É a
+<b>camada automática de avaliação</b> que ordena o que aparece primeiro, e o
+<b>pagamento intermediado</b>, que é a única forma de a comissão existir de fato.</p>
+
+<h3>Decisões travadas</h3>
+<table>
+<tr><th style="width:32%">Item</th><th>Decisão</th></tr>
+<tr><td>Modelo de receita</td><td>Marketplace com comissão sobre a venda</td></tr>
+<tr><td>Recorte</td><td>Segmentado por categoria de produto</td></tr>
+<tr><td>Primeiro público</td><td>Base própria já existente</td></tr>
+<tr><td>Escala inicial</td><td>4 grupos</td></tr>
+<tr><td>Aquisição orgânica</td><td>Programa de indicação com crédito (não sorteio)</td></tr>
+<tr><td>Curadoria</td><td>Automática, por bot, em três camadas de score</td></tr>
+</table>
+
+<div class="box">
+<b>A tese em uma frase.</b> Grupo de desapego é commodity; o que ninguém entrega é confiança.
+Pagamento protegido mais ranking por qualidade resolvem os dois medos que travam a venda de
+usado — levar calote e comprar porcaria. É por isso que o vendedor aceita pagar comissão.
+</div>
+
+<h2>2. Arquitetura de plataforma</h2>
+<p>A escolha de onde cada coisa roda não é preferência. É imposta por limite técnico.</p>
+
+<div class="alerta">
+<b>O WhatsApp não automatiza grupo.</b> A Groups API oficial da Cloud API existe, mas
+trava em <b>8 participantes por grupo</b> — foi feita para atendimento, não para comunidade.
+As bibliotecas não oficiais (Baileys, whatsapp-web.js) funcionam e levam a banimento.
+Nenhuma receita deve ser construída sobre elas.
+</div>
+
+<table>
+<tr><th style="width:26%"></th><th>Telegram</th><th>WhatsApp</th></tr>
+<tr><td><b>Papel</b></td><td>Motor transacional</td><td>Captação e vitrine</td></tr>
+<tr><td>Membros por grupo</td><td>200.000</td><td>1.024</td></tr>
+<tr><td>Agrupamento</td><td>Canais ilimitados</td><td>Comunidade: até 100 grupos</td></tr>
+<tr><td>Bot</td><td>API completa e gratuita</td><td>Inviável (teto de 8)</td></tr>
+<tr><td>Pagamento</td><td>Nativo dentro do bot</td><td>Fora da plataforma</td></tr>
+<tr><td>Operação</td><td>Automática</td><td>Manual / semiautomática</td></tr>
+</table>
+
+<div class="ok">
+<b>Regra de ouro.</b> O anúncio aparece nos dois. Mas <b>fecha sempre no bot do Telegram</b> —
+é lá que o split de pagamento acontece, e é só lá que a comissão é capturável.
+</div>
+
+<h2>3. Modelo de receita — duas camadas</h2>
+<p>Comissão pura não funciona no dia 1 porque exige confiança que a operação ainda não tem.
+A solução é faturar onde é fácil enquanto se constrói onde é lucrativo.</p>
+
+<h3>Camada 1 — taxa de publicação <span class="peq">(receita imediata)</span></h3>
+<p>O vendedor paga para anunciar ou para subir ao topo do feed. Captura garantida, zero
+disputa, zero risco operacional. É o que paga o custo da operação enquanto a camada 2 amadurece.</p>
+
+<h3>Camada 2 — comissão via escrow <span class="peq">(a receita real)</span></h3>
+<p>O comprador paga dentro do bot. A plataforma retém o valor até a confirmação de entrega e
+repassa ao vendedor descontando a comissão. O vendedor adere <b>porque o selo de pagamento
+protegido faz vender mais</b> — não por obrigação contratual.</p>
+
+<div class="mono">COMPRADOR paga no bot
+     v
+PLATAFORMA retem (escrow)   -->  vendedor ve "pagamento confirmado"
+     v
+VENDEDOR envia / entrega
+     v
+COMPRADOR confirma recebimento
+     v
+SPLIT automatico: vendedor recebe liquido | plataforma retem a comissao</div>
+
+<p>Gateways com split no Brasil: <b>Mercado Pago, Asaas, Pagar.me, Efí.</b></p>
+
+<div class="alerta">
+<b>Por que split e não conta própria.</b> Com split, o arranjo de pagamento é do gateway e a
+plataforma apenas recebe sua comissão. Reter dinheiro de terceiro em conta própria configura
+atividade de pagamento e traz exigência regulatória muito maior. Não improvise nesse ponto.
+</div>
+
+<div class="pg"></div>
+<h2>4. Programa de indicação</h2>
+
+<h3>Sorteio exige autorização prévia — e multa pesada</h3>
+<p>A <b>Lei 5.768/1971</b> condiciona a distribuição gratuita de prêmios por sorteio à
+autorização prévia da <b>SPA/MF</b> (Secretaria de Prêmios e Apostas do Ministério da Fazenda).
+A <b>Portaria SPA/MF 1.818/2026</b> regulamentou o regime sancionador — a fiscalização ficou
+mais rígida, não mais frouxa. A multa alcança <b>100% do valor total dos prêmios</b>.</p>
+
+<p>Chamar a ação de "concurso cultural" não resolve: a isenção vale apenas para concurso
+<b>exclusivamente</b> cultural, julgado por mérito intelectual. Um ranking de quem indicou mais
+é desempenho, não criatividade — cai na mesma lei.</p>
+
+<h3>Crédito é melhor, e não só pela lei</h3>
+<table>
+<tr><th style="width:26%"></th><th>Sorteio</th><th class="rec">Crédito na plataforma</th></tr>
+<tr><td>Autorização</td><td>SPA/MF: prazo e taxa</td><td class="rec">Nenhuma</td></tr>
+<tr><td>Recompensa</td><td>Probabilística</td><td class="rec">Imediata e certa</td></tr>
+<tr><td>Destino do dinheiro</td><td>Sai da operação</td><td class="rec">Volta para dentro</td></tr>
+<tr><td>Retenção</td><td>Zero após o sorteio</td><td class="rec">O crédito só vale aqui</td></tr>
+<tr><td>Custo de implantação</td><td>Alto</td><td class="rec">Baixo</td></tr>
+</table>
+
+<p>O crédito resgatável apenas dentro da plataforma alimenta a camada 1: o indicador ganha
+R$ 10 e gasta exatamente ali, em taxa de publicação ou destaque. O sorteio manda dinheiro
+para fora e não prende ninguém depois do resultado.</p>
+
+<h3>Mecânica</h3>
+<div class="mono">INDICOU --> o INDICADO publica o PRIMEIRO ANUNCIO --> os dois ganham credito
+
+    R$ 10 para quem indicou   .   R$ 10 para quem entrou
+
+GATILHO = primeiro anuncio publicado, NAO o cadastro.
+Cadastro e vaidade. Anuncio e inventario.</div>
+
+<div class="alerta">
+<b>Trava anti-fraude obrigatória.</b> O crédito só libera quando o anúncio do indicado
+<b>passa no score mínimo</b>. Sem essa trava, paga-se por conta fantasma com foto tirada da
+internet, e o programa vira ralo de caixa em uma semana.
+</div>
+
+<p>O sorteio pode entrar mais tarde, com autorização regular, dimensionado pelos números reais
+do piloto. Não no arranque.</p>
+
+<h2>5. Sistema de avaliação automática</h2>
+<p>É o mecanismo que transforma volume em qualidade. Anúncio ruim não é bloqueado — é
+<b>enterrado no feed</b>. O vendedor aprende sozinho a melhorar, sem moderação humana.</p>
+
+<h3>Camada A — score do anúncio (0 a 100)</h3>
+<p>Calculado no momento da publicação, pelo bot.</p>
+<table>
+<tr><th style="width:38%">Critério</th><th style="width:11%">Peso</th><th>Como o bot verifica</th></tr>
+<tr><td>Fotos: quantidade, nitidez, fundo</td><td>30</td><td>Visão computacional nas imagens</td></tr>
+<tr><td>Descrição completa</td><td>20</td><td>Campos preenchidos e contagem de caracteres</td></tr>
+<tr><td>Preço vs. mediana da categoria</td><td>25</td><td>Comparação com o histórico do banco</td></tr>
+<tr><td>Estado declarado + evidência</td><td>15</td><td>Foto confere com o estado informado</td></tr>
+<tr><td>Dados de entrega / retirada</td><td>10</td><td>Campos obrigatórios preenchidos</td></tr>
+</table>
+
+<h3>Camada B — classificação de estado</h3>
+<p>Menu fechado dentro do bot. <b>Nunca texto livre</b> — texto livre destrói a comparabilidade
+e impossibilita o cálculo de mediana de preço.</p>
+<div class="mono">Novo lacrado  |  Seminovo  |  Usado - bom  |  Usado - com marcas  |  Com defeito</div>
+
+<h3>Camada C — score do vendedor</h3>
+<p>Vendas concluídas · avaliação do comprador · disputas abertas · tempo de resposta.</p>
+
+<h3>Ordem do feed</h3>
+<div class="mono">posicao = score do anuncio  x  score do vendedor  x  recencia</div>
+<p>É essa multiplicação que faz volume virar qualidade sem custo de moderação.</p>
+
+<div class="pg"></div>
+<h2>6. Categorias dos 4 grupos</h2>
+<p>Critério de seleção: ticket alto o bastante para a comissão pagar a operação, com giro rápido.</p>
+<table>
+<tr><th style="width:30%">Categoria</th><th style="width:20%">Ticket típico</th><th>Razão da escolha</th></tr>
+<tr><td>Celulares e eletrônicos</td><td>R$ 300 – 2.000</td><td>Maior liquidez do mercado de usados</td></tr>
+<tr><td>Games e informática</td><td>R$ 200 – 3.000</td><td>Público engajado e já familiarizado com escrow</td></tr>
+<tr><td>Bebê e infantil</td><td>R$ 50 – 500</td><td>Recorrência alta: o vendedor vira comprador no mês seguinte</td></tr>
+<tr><td>Ferramentas e equipamentos</td><td>R$ 100 – 1.500</td><td>Ticket alto com pouquíssima concorrência organizada</td></tr>
+</table>
+
+<div class="box">
+<b>Moda ficou de fora de propósito.</b> Volume enorme, ticket de R$ 30. A comissão não paga o
+custo de moderar. Entra na fase 5, quando o custo marginal de um grupo novo for próximo de zero.
+</div>
+
+<h2>7. Marca</h2>
+<p>Verificação de DNS feita em 06/10/2026. <span class="peq">Atenção: "sem DNS" indica forte
+chance de estar livre, mas não garante — no .com.br muitos domínios ficam registrados sem site.
+Confirmar no registro.br antes de comprar.</span></p>
+<table>
+<tr><th style="width:22%">Nome</th><th style="width:15%">.com.br</th><th style="width:13%">.com</th><th>Observação</th></tr>
+<tr class="rec"><td>REVIRA</td><td>sem DNS</td><td>tomado</td><td>Recomendado — aceita submarca por categoria</td></tr>
+<tr><td>USADIN</td><td>sem DNS</td><td>sem DNS</td><td>Direto, mas desvaloriza ticket alto</td></tr>
+<tr><td>VIRALEVE</td><td>sem DNS</td><td>sem DNS</td><td>Aspiracional, não diz o que é</td></tr>
+<tr><td>PASSA ADIANTE</td><td>sem DNS</td><td>sem DNS</td><td>Cultural, porém 12 caracteres</td></tr>
+<tr><td>GARIMPEI</td><td>sem DNS</td><td>tomado</td><td>Fala só com o comprador</td></tr>
+</table>
+
+<div class="ok">
+<b>Por que REVIRA.</b> Duplo sentido que nenhum outro candidato tem: <i>revirar</i> (garimpar,
+procurar no meio das coisas) e <i>re-virar</i> (virar de novo, segunda vida). E, decisivo para
+este projeto: suporta submarca sem travar — <b>Revira Tech · Revira Baby · Revira Casa ·
+Revira Ferramentas</b>. Os outros nomes quebram nesse teste.
+</div>
+
+<p><b>Pendente de checagem manual:</b> @ no Instagram · @ no Telegram · marca no INPI, classe 35.
+Domínio livre com marca registrada de terceiro é processo na certa.</p>
+
+<h2>8. Ordem de execução</h2>
+<p>Nenhuma fase começa sem a anterior validada.</p>
+<table>
+<tr><th style="width:5%"></th><th style="width:19%">Fase</th><th>Entrega</th></tr>
+<tr><td><span class="fase">1</span></td><td><b>Fundação</b></td>
+    <td>Marca definida e registrada · regras do grupo · bot do Telegram publicando anúncio
+        formatado com score · 4 grupos criados nos dois apps</td></tr>
+<tr><td><span class="fase">2</span></td><td><b>Piloto</b></td>
+    <td>Povoar com a base própria · 2 semanas operando sem monetizar · medir tudo</td></tr>
+<tr><td><span class="fase">3</span></td><td><b>Camada 1</b></td>
+    <td>Ligar taxa de publicação e destaque · ligar o programa de indicação com crédito</td></tr>
+<tr><td><span class="fase">4</span></td><td><b>Camada 2</b></td>
+    <td>Escrow com split · selo de vendedor verificado · fluxo de disputa</td></tr>
+<tr><td><span class="fase">5</span></td><td><b>Escala</b></td>
+    <td>Replicar o playbook por categoria e por região</td></tr>
+</table>
+
+<h2>9. Métricas do piloto</h2>
+<p>Sem estes números, não se decide nada na fase 3.</p>
+<div class="grid">
+  <div class="col">
+    <div class="kpi"><div class="l">Inventário</div><div class="n">Anúncios / dia</div>
+      <div class="peq">Por grupo. É o combustível — sem anúncio não há marketplace.</div></div>
+    <div class="kpi"><div class="l">Demanda</div><div class="n">Taxa de resposta</div>
+      <div class="peq">Quantos anúncios recebem ao menos um interessado.</div></div>
+    <div class="kpi"><div class="l">Conversão</div><div class="n">Fechados / 100</div>
+      <div class="peq">Negócios concluídos a cada 100 anúncios publicados.</div></div>
+  </div>
+  <div class="col">
+    <div class="kpi"><div class="l">Receita potencial</div><div class="n">Ticket médio</div>
+      <div class="peq">Por categoria. Define o percentual viável de comissão.</div></div>
+    <div class="kpi"><div class="l">Retenção</div><div class="n">Churn 7 dias</div>
+      <div class="peq">Quantos membros saem na primeira semana.</div></div>
+    <div class="kpi"><div class="l">Qualidade</div><div class="n">Score médio</div>
+      <div class="peq">Score do anúncio ao longo do tempo. Deve subir sozinho.</div></div>
+  </div>
+</div>
+
+<div class="pg"></div>
+<h2>10. Riscos abertos</h2>
+<table>
+<tr><th style="width:30%">Risco</th><th style="width:11%">Impacto</th><th>Mitigação</th></tr>
+<tr><td>Base vem de iGaming; a associação pode queimar as duas marcas</td><td>Alto</td>
+    <td>Marca separada, sem vínculo visível. Não anunciar como derivado da operação atual.</td></tr>
+<tr><td>Vazamento da comissão antes de o escrow existir</td><td>Alto</td>
+    <td>A camada 1 sustenta a operação até a camada 2 subir. Não depender de comissão no início.</td></tr>
+<tr><td>Fraude no programa de indicação</td><td>Alto</td>
+    <td>Crédito só libera com anúncio aprovado no score mínimo.</td></tr>
+<tr><td>Moderação manual no WhatsApp não escala</td><td>Médio</td>
+    <td>WhatsApp apenas espelha. Toda transação vive no Telegram.</td></tr>
+<tr><td>Responsabilidade solidária do marketplace (CDC)</td><td>Médio</td>
+    <td>Consultar jurídico antes da fase 4. Termos de uso claros sobre o papel de intermediário.</td></tr>
+<tr><td>Produto ilícito, falsificado ou roubado anunciado</td><td>Médio</td>
+    <td>Lista de categorias proibidas no bot + denúncia em um toque + bloqueio por CPF.</td></tr>
+</table>
+
+<h2>11. Pendente de definição</h2>
+<ul>
+  <li><b>Nome</b> — escolher entre os 5 candidatos e validar @ e INPI</li>
+  <li><b>Percentual da comissão</b> e valor da taxa de publicação</li>
+  <li><b>Gateway</b> — Mercado Pago, Asaas, Pagar.me ou Efí</li>
+  <li><b>Região</b> de atuação — nacional ou com recorte</li>
+  <li><b>Valor do crédito</b> de indicação e seu teto mensal por usuário</li>
+</ul>
+
+<h2>12. Checklist de arranque — Fase 1</h2>
+<ul class="ck">
+  <li>Escolher o nome e confirmar domínio, @ no Instagram, @ no Telegram e INPI classe 35</li>
+  <li>Registrar o domínio e reservar os @ nas duas redes</li>
+  <li>Criar o bot no @BotFather e guardar o token</li>
+  <li>Escrever as regras do grupo e a lista de categorias proibidas</li>
+  <li>Definir o template do anúncio (campos obrigatórios do formulário do bot)</li>
+  <li>Implementar o cálculo das três camadas de score</li>
+  <li>Criar os 4 grupos no Telegram e os 4 no WhatsApp</li>
+  <li>Escrever a mensagem de boas-vindas e o fluxo de onboarding do bot</li>
+  <li>Montar o painel de métricas do piloto</li>
+  <li>Definir quem modera e em que horário</li>
+</ul>
+
+<div class="box" style="margin-top:20px">
+<b>Próximo passo imediato:</b> decidir o nome. Tudo na fase 1 depende dele — domínio, @, bot,
+grupos e a identidade dos quatro segmentos.
+</div>
+
+<p class="peq" style="margin-top:22px; border-top:1px solid #dde3e2; padding-top:7px">
+Fontes consultadas em 06/10/2026 — Lei 5.768/1971 · Portaria SPA/MF 1.818/2026 · documentação
+da WhatsApp Cloud API (Groups API) · limites públicos de grupos e comunidades do WhatsApp ·
+documentação da Bot API do Telegram. Verificação de domínios por resolução DNS direta.
+</p>
+
+</body></html>
