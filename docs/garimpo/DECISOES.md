@@ -29,6 +29,9 @@
 - **Funil misturado:** o modelo herdado do iGaming junta oferta (vendedor/anúncio) e demanda (membro/venda). O dicionário de métricas deve separar os dois lados.
 - **Fase de volume:** com grupos gratuitos e comissão autodeclarada, a métrica-norte do piloto é **volume** (membros, anúncios, vendas), não receita. O hero do painel deve refletir isso.
 
+## Specs
+- `SPEC-bot-ofertas.md` — bot de envio de ofertas (rascunho)
+
 ## Pendências
 
 | Pendência | Dono | Próximo passo |
@@ -38,4 +41,8 @@
 | % de comissão | Parte pensante → 00BABY valida | Propor faixa com benchmark |
 | Grupos/categorias do piloto | 00BABY | Definir 1º grupo piloto |
 | Dicionário de métricas (oferta × demanda) | Parte pensante | Rascunhar após nome |
+| **Validar pivô: operação é de ofertas com link de afiliado** (não desapego) — revisa D2/D3 | 00BABY | Confirmar |
+| Plataformas de afiliado de origem (Shopee/ML/Amazon…) | 00BABY | Listar |
+| Infra do bot (sessão vs Supabase `sem-pino`) | 00BABY | Escolher |
+| Token do bot (@BotFather) | 00BABY | Criar; não colar no chat |
 | Adicionar repo `sem-pino` à sessão | Parte pensante | Na hora do build (Fase 2+) |
