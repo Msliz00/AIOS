@@ -1,0 +1,185 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<!-- Pop-up Aviator v7 — avião oficial (aviao_oficial.py) + botão animado (CSS) — 1080x1200. Textos em HTML (grafia exata); avião/moedas vêm de arte3d_v4.html (three.js).
+     Gerar: node render_v7.mjs -->
+<style>
+@font-face{font-family:M;src:url(montserrat-latin-900-italic.woff2);font-weight:900;font-style:italic}
+@font-face{font-family:K;src:url(kaushan-script-latin-400-normal.woff2)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1200px;background:transparent;overflow:hidden}
+.card{position:relative;width:1080px;height:1200px;border-radius:56px;overflow:hidden;isolation:isolate;
+  background:
+    radial-gradient(620px 520px at 68% 28%,rgba(255,60,70,.42) 0%,rgba(190,10,40,.18) 45%,transparent 72%),
+    radial-gradient(1100px 900px at 0% 92%,#b00a24 0%,#6a0518 26%,#34040f 52%,transparent 80%),
+    linear-gradient(160deg,#1a0309 0%,#12030a 45%,#06030a 100%)}
+.abs{position:absolute;inset:0}
+/* raios saindo do canto inferior esquerdo */
+.rays{background:repeating-conic-gradient(from 0deg at 0% 90%,rgba(255,120,120,.17) 0 2.6deg,transparent 2.6deg 7deg);
+  -webkit-mask-image:radial-gradient(1250px 1050px at 0% 90%,#000 12%,transparent 82%)}
+.rays2{background:repeating-conic-gradient(from 1.5deg at 0% 90%,rgba(255,220,170,.16) 0 .9deg,transparent .9deg 11deg);
+  -webkit-mask-image:radial-gradient(1400px 1200px at 0% 90%,#000 10%,transparent 78%);mix-blend-mode:screen}
+.core{background:radial-gradient(420px 360px at 0% 92%,rgba(255,170,120,.4) 0%,rgba(255,50,60,.25) 35%,transparent 72%);mix-blend-mode:screen}
+.grid{background-image:linear-gradient(rgba(255,255,255,.04) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.04) 2px,transparent 2px);background-size:108px 108px;
+  -webkit-mask-image:radial-gradient(700px 600px at 62% 34%,#000 10%,transparent 90%)}
+.dim{background:radial-gradient(700px 520px at 66% 30%,rgba(6,2,6,.38),rgba(6,2,6,.66) 100%)}
+.vig{background:radial-gradient(900px 950px at 50% 46%,transparent 55%,rgba(0,0,0,.72) 100%)}
+.halo{background:radial-gradient(360px 250px at 68% 27%,rgba(255,215,150,.18),rgba(255,90,70,.07) 55%,transparent 75%);mix-blend-mode:screen}
+svg.art,img.l3d{position:absolute;left:0;top:0;width:1080px;height:1200px}
+img.back{filter:blur(4px) brightness(.72) saturate(1.1);opacity:.9}
+img.front{filter:drop-shadow(0 26px 22px rgba(0,0,0,.55)) drop-shadow(0 0 26px rgba(255,60,60,.22))}
+img.plane{position:absolute;left:478px;top:214px;width:540px;transform:rotate(-4deg);
+  filter:brightness(1.18) saturate(1.08) drop-shadow(0 24px 20px rgba(0,0,0,.6)) drop-shadow(0 0 24px rgba(255,60,40,.3))}
+.mini{position:absolute;transform:rotate(-4deg)}
+.mini img{display:block;width:100%;filter:brightness(1.05) drop-shadow(0 8px 8px rgba(0,0,0,.5))}
+.mini::before{content:"";position:absolute;right:86%;top:74%;width:120%;height:5%;border-radius:9px;transform-origin:100% 50%;transform:rotate(-13deg);
+  background:linear-gradient(90deg,rgba(255,50,60,0),rgba(255,70,80,.75))}
+.mini.m1{left:34px;top:196px;width:168px;opacity:.9}
+.mini.m2{left:880px;top:478px;width:150px;opacity:.85}
+.mini.m3{left:96px;top:520px;width:118px;opacity:.6;filter:blur(1.2px)}
+.mini.m4{left:905px;top:120px;width:104px;opacity:.55;filter:blur(1.4px)}
+img.near{filter:blur(7px) brightness(.6)}
+.frame{position:absolute;inset:0;border-radius:56px;border:6px solid transparent;
+  background:linear-gradient(160deg,#fff0a0,#d88a00 30%,#7a3d00 55%,#ffcf40 80%,#fff3b0) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor}
+.frame2{position:absolute;inset:6px;border-radius:50px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.55),inset 0 0 46px rgba(255,40,60,.22)}
+
+/* logo */
+.logo{position:absolute;left:0;right:0;top:30px;height:220px;transform:rotate(-4deg);font:400 172px/220px K;text-align:center}
+.logo span{position:absolute;left:0;right:0;top:0}
+.logo .g{color:#ff2a45;filter:blur(26px);opacity:.95}
+.logo .o{color:#fff;-webkit-text-stroke:13px #fff;text-shadow:0 7px 0 #b9a8ac,0 12px 0 #5a0010,0 20px 22px rgba(0,0,0,.6)}
+.logo .f{background:linear-gradient(180deg,#ff9478 8%,#f2412c 34%,#dc2414 58%,#9c1206 86%);-webkit-background-clip:text;color:transparent;
+  filter:drop-shadow(0 3px 0 #7d0015)}
+.logo .bw,.logo .br{position:absolute;left:226px;top:133px;width:168px;height:18px;border-radius:12px;transform:rotate(-5deg)}
+.logo .bw{background:#fff;box-shadow:0 0 0 7px #fff,0 9px 0 5px #5a0010}
+.logo .br{background:linear-gradient(180deg,#f2412c,#dc2414)}
+.logo .s{background:linear-gradient(180deg,rgba(255,255,255,.75) 18%,rgba(255,255,255,0) 44%);-webkit-background-clip:text;color:transparent;mix-blend-mode:screen}
+
+/* logo: lettering original (máscaras geradas por logo_trace.py) */
+.lg{position:absolute;left:206px;top:38px;width:656px;height:207px;transform:rotate(-4deg);
+  filter:drop-shadow(0 14px 14px rgba(0,0,0,.55)) drop-shadow(0 0 30px rgba(255,50,40,.45)) drop-shadow(0 0 70px rgba(255,40,40,.2))}
+.lg i{position:absolute;inset:0;-webkit-mask:var(--m) center/100% 100% no-repeat}
+.lg .sh{--m:url(logo_aviator_outline.png);background:linear-gradient(180deg,#b9a8ac,#5a0010);transform:translateY(9px)}
+.lg .ol{--m:url(logo_aviator_outline.png);background:linear-gradient(180deg,#fff,#ffe9e4)}
+.lg .fl{--m:url(logo_aviator_fill.png);background:linear-gradient(180deg,#ff7a5c 6%,#f2412c 34%,#dc2414 60%,#9c1206 92%)}
+.lg .gl{--m:url(logo_aviator_fill.png);background:linear-gradient(180deg,rgba(255,255,255,.6) 14%,rgba(255,255,255,0) 46%);mix-blend-mode:screen}
+
+/* placa */
+.plaque{position:absolute;left:50px;right:50px;top:590px;height:376px;transform:rotate(-3deg);border-radius:46px;padding:9px;
+  background:linear-gradient(172deg,#fff6b8 0%,#ffcf45 14%,#b56a00 38%,#6f3600 52%,#e9a100 70%,#fff0a0 88%,#c47a00 100%);
+  box-shadow:0 2px 0 #fff8c8 inset,0 -3px 0 rgba(90,40,0,.8) inset,0 10px 0 #4a2300,0 34px 60px rgba(0,0,0,.78),0 0 110px rgba(255,160,0,.5)}
+.plaque i{position:relative;display:block;width:100%;height:100%;border-radius:38px;overflow:hidden;
+  background:radial-gradient(760px 300px at 50% -6%,#7a1228 0%,#3a0916 46%,#16040b 100%);
+  box-shadow:inset 0 0 0 3px #1a0408,inset 0 0 0 5px rgba(255,205,90,.75),inset 0 12px 26px rgba(0,0,0,.6),inset 0 -40px 70px rgba(0,0,0,.6)}
+.plaque i::before{content:"";position:absolute;left:-5%;right:-5%;top:-62%;height:100%;border-radius:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,0) 55%,rgba(255,255,255,.13) 100%)}
+.plaque i::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 3px,transparent 3px 16px)}
+
+/* frase */
+.hl{position:absolute;left:0;right:0;text-align:center;font:italic 900 132px M;letter-spacing:-3px;white-space:nowrap;transform:rotate(-3deg)}
+.hl span{display:block}
+.hl .b,.hl .e,.hl .f,.hl .s{position:absolute;left:0;right:0;top:0}
+.hl .b{position:relative;color:#3a1500;-webkit-text-stroke:15px #3a1500;
+  text-shadow:1px 2px 0 #6b2f00,2px 4px 0 #642b00,3px 6px 0 #5c2700,4px 8px 0 #542300,5px 10px 0 #4b1f00,6px 12px 0 #431b00,7px 14px 0 #3a1700,8px 16px 0 #311200,
+    10px 26px 26px rgba(0,0,0,.85)}
+.hl .e{color:#ffe9a0;-webkit-text-stroke:3px #ffeaa0;paint-order:stroke fill;filter:drop-shadow(0 0 12px rgba(255,170,30,.55))}
+.hl .f{background:linear-gradient(180deg,#fffde0 4%,#ffe96a 22%,#ffc21a 44%,#f08a00 53%,#b85a00 56%,#ff9d00 66%,#ffc93a 82%,#fff3a8 97%);
+  -webkit-background-clip:text;color:transparent}
+.hl .s{background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.5) 43%,transparent 50%,transparent 70%,rgba(255,255,255,.3) 74%,transparent 80%);
+  -webkit-background-clip:text;color:transparent;mix-blend-mode:screen}
+.h1{top:612px}
+.h2{top:752px;font-size:184px;letter-spacing:-5px}
+
+/* botão */
+.btn{position:absolute;left:150px;right:150px;top:1000px;height:126px;border-radius:70px;padding:7px;
+  background:linear-gradient(180deg,#fffbd0,#ffcf45 30%,#9a5200 100%);
+  box-shadow:0 9px 0 #7a3c00,0 11px 0 #3a1a00,0 26px 36px rgba(0,0,0,.7),0 0 90px rgba(255,190,40,.85)}
+.btn b{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:64px;overflow:hidden;
+  font:italic 900 66px M;letter-spacing:-1px;color:#2b1100;
+  background:linear-gradient(180deg,#fff27a 0%,#ffd21e 40%,#ffa800 56%,#ff8400 100%);
+  box-shadow:inset 0 4px 0 rgba(255,255,255,.8),inset 0 -10px 16px rgba(140,60,0,.55);text-shadow:0 2px 0 rgba(255,240,150,.85)}
+/* motion do botão: pulso + glow + brilho varrendo (loop de 2s) */
+.btn{animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 9px 0 #7a3c00,0 11px 0 #3a1a00,0 26px 36px rgba(0,0,0,.7),0 0 60px rgba(255,190,40,.55)}
+  50%{transform:scale(1.06);box-shadow:0 9px 0 #7a3c00,0 11px 0 #3a1a00,0 30px 40px rgba(0,0,0,.7),0 0 120px rgba(255,205,60,1)}}
+.btn b::after{animation:shine 2s ease-in-out infinite}
+@keyframes shine{0%{left:-25%}65%,100%{left:120%}}
+.btn b::before{content:"";position:absolute;left:18px;right:18px;top:7px;height:44%;border-radius:60px;
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.08))}
+.btn b::after{content:"";position:absolute;top:-20%;bottom:-20%;left:63%;width:110px;transform:skewX(-22deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent)}
+.btn b em{position:relative;z-index:1;font-style:inherit}
+.foot{position:absolute;left:0;right:0;bottom:20px;text-align:center;font:italic 900 19px M;letter-spacing:1.5px;color:rgba(255,255,255,.6)}
+.foot em{display:inline-block;border:2px solid rgba(255,255,255,.65);border-radius:50%;width:38px;height:38px;line-height:34px;font-size:15px;margin-right:10px;font-style:normal;letter-spacing:0}
+</style></head><body><div class="card">
+<div class="abs rays"></div><div class="abs rays2"></div><div class="abs core"></div><div class="abs grid"></div>
+<svg class="art" viewBox="0 0 1080 1200">
+<defs>
+ <filter id="neb" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".006 .011" numOctaves="4" seed="7"/>
+  <feColorMatrix values="0 0 0 0 1  0 0 0 0 .18  0 0 0 0 .22  1.5 0 0 0 -.62"/></filter>
+ <radialGradient id="nm" cx=".35" cy=".5" r=".7"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+ <mask id="nebm"><rect width="1080" height="1200" fill="url(#nm)"/></mask>
+</defs>
+<rect width="1080" height="1200" filter="url(#neb)" mask="url(#nebm)" opacity=".5" style="mix-blend-mode:screen"/>
+<g id="bokeh"></g>
+</svg>
+<div class="abs halo"></div>
+<img class="l3d back" src="arte3d_v7_back.png">
+<div class="abs dim"></div>
+<svg class="art" viewBox="0 0 1080 1200">
+<defs>
+ <linearGradient id="area" gradientUnits="userSpaceOnUse" x1="0" y1="380" x2="0" y2="660"><stop offset="0" stop-color="#ff2443" stop-opacity=".0"/><stop offset=".5" stop-color="#ff2443" stop-opacity=".45"/><stop offset="1" stop-color="#ff2443" stop-opacity="0"/></linearGradient>
+ <linearGradient id="fg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+ <mask id="fade" maskUnits="userSpaceOnUse" x="-20" y="0" width="640" height="1200"><rect x="-20" y="0" width="575" height="1200" fill="url(#fg)"/></mask>
+ <linearGradient id="trail" gradientUnits="userSpaceOnUse" x1="0" y1="608" x2="552" y2="512"><stop offset="0" stop-color="#ff2443"/><stop offset=".7" stop-color="#ff4a62"/><stop offset="1" stop-color="#ffd9c0"/></linearGradient>
+ <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="12"/></filter>
+ <filter id="glow2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
+ <radialGradient id="sp"><stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="#ffe9a0"/><stop offset=".6" stop-color="#ff9a30" stop-opacity=".5"/><stop offset="1" stop-color="#ff5a20" stop-opacity="0"/></radialGradient>
+ <path id="star" d="M0-22 C1.5-6 6-1.5 22 0 C6 1.5 1.5 6 0 22 C-1.5 6 -6 1.5 -22 0 C-6-1.5 -1.5-6 0-22Z" fill="#fffbe0"/>
+</defs>
+<path id="curve" d="M-20 608 C220 606 430 592 552 512" fill="none"/>
+<path d="M-20 608 C220 606 430 592 552 512 L552 640 L-20 1200Z" fill="url(#area)" mask="url(#fade)"/>
+<use href="#curve" stroke="#ff2443" stroke-width="26" filter="url(#glow)" opacity=".5"/>
+<use href="#curve" stroke="url(#trail)" stroke-width="12" opacity=".6" filter="url(#glow2)" stroke-linecap="round"/>
+<use href="#curve" stroke="url(#trail)" stroke-width="10" stroke-linecap="round"/>
+<use href="#curve" stroke="#fff2ee" stroke-width="3.5" stroke-linecap="round"/>
+<g id="sparks" style="mix-blend-mode:screen" opacity=".45"></g>
+</svg>
+<div class="plaque"><i></i></div>
+<div class="mini m3"><img src="aviao_oficial.png"></div><div class="mini m4"><img src="aviao_oficial.png"></div><div class="mini m1"><img src="aviao_oficial.png"></div><div class="mini m2"><img src="aviao_oficial.png"></div>
+<img class="plane" src="aviao_oficial.png">
+<img class="l3d front" src="arte3d_v7_front.png">
+<svg class="art" viewBox="0 0 1080 1200" style="mix-blend-mode:screen;opacity:.6"><g id="stars"></g></svg>
+<img class="l3d near" src="arte3d_v7_near.png">
+<div class="lg"><i class="sh"></i><i class="ol"></i><i class="fl"></i><i class="gl"></i></div>
+<div class="hl h1"><span class="b">DEPOSITOU,</span><span class="e">DEPOSITOU,</span><span class="f">DEPOSITOU,</span><span class="s">DEPOSITOU,</span></div>
+<div class="hl h2"><span class="b">GANHOU!</span><span class="e">GANHOU!</span><span class="f">GANHOU!</span><span class="s">GANHOU!</span></div>
+<div class="btn"><b><em>RESGATE AQUI</em></b></div>
+<div class="foot"><em>18+</em>JOGUE COM RESPONSABILIDADE</div>
+<div class="abs vig" style="pointer-events:none;mix-blend-mode:multiply;opacity:.55"></div>
+<div class="frame2"></div><div class="frame"></div>
+</div>
+<script>
+// partículas determinísticas (bokeh, faíscas, brilhos)
+let s = 20261127; const R = () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+const NS = 'http://www.w3.org/2000/svg';
+const el = (p, n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+const bokeh = document.getElementById('bokeh');
+for (let i = 0; i < 24; i++) { const r = 6 + R() * 26;
+  el(bokeh, 'circle', { cx: R() * 1080, cy: R() * 620, r, fill: R() < .5 ? '#ff5a5a' : '#ffc060', opacity: (.03 + R() * .09).toFixed(3), style: `filter:blur(${(r / 5).toFixed(1)}px)` }); }
+// faíscas: irradiam do canto inferior esquerdo e acompanham a curva
+const sparks = document.getElementById('sparks'), curve = document.getElementById('curve'), L = curve.getTotalLength();
+for (let i = 0; i < 70; i++) { const t = Math.pow(R(), .7), p = curve.getPointAtLength(L * t), q = curve.getPointAtLength(Math.min(L, L * t + 1));
+  const ang = Math.atan2(q.y - p.y, q.x - p.x), off = (R() - .5) * (30 + 120 * R()), nx = -Math.sin(ang), ny = Math.cos(ang);
+  const x = p.x + nx * off, y = p.y + ny * off, len = 6 + R() * 30, w = 1.2 + R() * 2.6, a = ang + (R() - .5) * .5;
+  el(sparks, 'line', { x1: x, y1: y, x2: x + Math.cos(a) * len, y2: y + Math.sin(a) * len, stroke: R() < .6 ? '#ffd27a' : '#fff4d8', 'stroke-width': w.toFixed(1), 'stroke-linecap': 'round', opacity: (.35 + R() * .65).toFixed(2) });
+  if (R() < .35) el(sparks, 'circle', { cx: x, cy: y, r: 5 + R() * 9, fill: 'url(#sp)', opacity: .9 }); }
+for (let i = 0; i < 60; i++) { const a = -(R() * 80) * Math.PI / 180, d = 90 + R() * 900, x = Math.cos(a) * d, y = 1080 + Math.sin(a) * d;
+  el(sparks, 'circle', { cx: x, cy: y, r: (1 + R() * 2.6).toFixed(1), fill: R() < .5 ? '#ffe7a8' : '#ff9a70', opacity: (.25 + R() * .6).toFixed(2) }); }
+// brilhos em estrela ao redor do avião e das moedas
+const stars = document.getElementById('stars');
+[[300,246,1.1],[1014,322,.8],[452,446,.8],[236,414,.8],[690,560,.6]].forEach(([x, y, k]) => {
+  el(stars, 'circle', { cx: x, cy: y, r: 26 * k, fill: 'url(#sp)', opacity: .55 });
+  el(stars, 'use', { href: '#star', transform: `translate(${x} ${y}) scale(${k}) rotate(${(R() * 20 - 10).toFixed(0)})` }); });
+</script>
+</body></html>
