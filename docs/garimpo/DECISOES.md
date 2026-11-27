@@ -24,6 +24,19 @@
 | D5 | 2026-10-13 | **Projeto terá outro nome.** | "Garimpo" é provisório. Dono vai enviar linha de sugestões. Paleta atual segue até o nome sair. |
 | D6 | 2026-11-27 | **Fonte de produtos: Mercado Livre** (por enquanto). | Agente coleta dados do ML a partir do link de afiliado. |
 | D7 | 2026-11-27 | **Bot roda no Supabase** (Edge Function, 24/7). | Org está no plano **free** (2 projetos ativos já em uso) → precisa liberar vaga. |
+| D8 | 2026-11-27 | **Pivô: operação passa a ser grupos de OFERTAS com link de afiliado** (ML). | **Substitui D2 e D3** (desapego/split). Receita = comissão de afiliado paga pela plataforma. |
+| D9 | 2026-11-27 | **Supabase:** `experts-painel` e `fluxo-cortes` pausados; `sem-pino` reativado para o bot. | Projeto do bot = `sem-pino` (ref `mvgbcjstimlarzxvbctp`). |
+| D10 | 2026-11-27 | **Execução etapa por etapa**, cada uma validada antes da próxima. | Ver roteiro abaixo. |
+
+## Roteiro do bot (etapa por etapa)
+| # | Etapa | Dono | Status |
+|---|---|---|---|
+| E1 | Coletar informações (token, grupos, ML) | 00BABY | 🟡 |
+| E2 | Banco: tabelas `ofertas`, `grupos`, `envios` | Claude | ⏳ |
+| E3 | Bot envia 1 oferta de teste no grupo teste | Claude | ⏳ |
+| E4 | Agente coleta dados do ML a partir do link | Claude | ⏳ |
+| E5 | Aprovação no painel → envio automático | Claude | ⏳ |
+| E6 | A/B com botões + contagem de cliques | Claude | ⏳ |
 
 ## Diagnósticos registrados
 
@@ -43,8 +56,6 @@
 | % de comissão | Parte pensante → 00BABY valida | Propor faixa com benchmark |
 | Grupos/categorias do piloto | 00BABY | Definir 1º grupo piloto |
 | Dicionário de métricas (oferta × demanda) | Parte pensante | Rascunhar após nome |
-| **Validar pivô: operação é de ofertas com link de afiliado** (não desapego) — revisa D2/D3 | 00BABY | Confirmar |
-| Vaga no Supabase free: pausar `experts-painel` ou `fluxo-cortes`, ou ir para Pro | 00BABY | Escolher |
 | Token do bot (@BotFather) | 00BABY | Em coleta; guardar no Secrets do Supabase |
 | Conta de afiliado ML + app no developers.mercadolivre.com.br | 00BABY | Em coleta |
 | Adicionar repo `sem-pino` à sessão | Parte pensante | Na hora do build (Fase 2+) |
