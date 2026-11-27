@@ -22,6 +22,8 @@
 | D3 | 2026-10-13 | **Comissão capturada via link de pagamento com split** (Asaas/Mercado Pago) no destino final. | Comprador paga no link do Garimpo; split repassa ao vendedor; webhook registra a venda. Comissão real e autônoma. |
 | D4 | 2026-10-13 | **Fonte de dados: planilha agora, bot depois.** | No piloto a comissão é **autodeclarada** (risco de subdeclaração, aceito). Migração para bot + split na Fase 3. |
 | D5 | 2026-10-13 | **Projeto terá outro nome.** | "Garimpo" é provisório. Dono vai enviar linha de sugestões. Paleta atual segue até o nome sair. |
+| D6 | 2026-11-27 | **Fonte de produtos: Mercado Livre** (por enquanto). | Agente coleta dados do ML a partir do link de afiliado. |
+| D7 | 2026-11-27 | **Bot roda no Supabase** (Edge Function, 24/7). | Org está no plano **free** (2 projetos ativos já em uso) → precisa liberar vaga. |
 
 ## Diagnósticos registrados
 
@@ -42,7 +44,7 @@
 | Grupos/categorias do piloto | 00BABY | Definir 1º grupo piloto |
 | Dicionário de métricas (oferta × demanda) | Parte pensante | Rascunhar após nome |
 | **Validar pivô: operação é de ofertas com link de afiliado** (não desapego) — revisa D2/D3 | 00BABY | Confirmar |
-| Plataformas de afiliado de origem (Shopee/ML/Amazon…) | 00BABY | Listar |
-| Infra do bot (sessão vs Supabase `sem-pino`) | 00BABY | Escolher |
-| Token do bot (@BotFather) | 00BABY | Criar; não colar no chat |
+| Vaga no Supabase free: pausar `experts-painel` ou `fluxo-cortes`, ou ir para Pro | 00BABY | Escolher |
+| Token do bot (@BotFather) | 00BABY | Em coleta; guardar no Secrets do Supabase |
+| Conta de afiliado ML + app no developers.mercadolivre.com.br | 00BABY | Em coleta |
 | Adicionar repo `sem-pino` à sessão | Parte pensante | Na hora do build (Fase 2+) |
