@@ -1,0 +1,101 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:M;src:url(montserrat-latin-900-italic.woff2);font-weight:900;font-style:italic}
+@font-face{font-family:K;src:url(kaushan-script-latin-400-normal.woff2)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1200px;background:transparent;overflow:hidden}
+.card{position:relative;width:1080px;height:1200px;border-radius:56px;overflow:hidden;
+  background:radial-gradient(900px 700px at 62% 36%,#7a0718 0%,#3c0410 38%,#14030a 70%,#07040c 100%)}
+.rays{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 0% 86%,rgba(255,255,255,.05) 0 3.2deg,transparent 3.2deg 6.4deg);
+  -webkit-mask-image:radial-gradient(1200px 1000px at 0% 86%,#000 20%,transparent 85%)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.045) 2px,transparent 2px);background-size:108px 108px;
+  -webkit-mask-image:linear-gradient(180deg,transparent 5%,#000 40%,#000 70%,transparent 100%)}
+svg.art{position:absolute;inset:0}
+.frame{position:absolute;inset:0;border-radius:56px;border:5px solid transparent;
+  background:linear-gradient(160deg,#fff0a0,#d88a00 30%,#7a3d00 55%,#ffcf40 80%,#fff3b0) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor}
+.logo{position:absolute;left:0;right:0;top:36px;text-align:center;font:400 168px K;color:#ff1f3d;transform:rotate(-4deg);
+  -webkit-text-stroke:3px #fff;paint-order:stroke fill;
+  text-shadow:0 5px 0 #7d0015,0 9px 0 #4a000c,0 0 34px rgba(255,40,70,.9),0 0 90px rgba(255,30,60,.55)}
+.plaque{position:absolute;left:54px;right:54px;top:588px;height:370px;transform:rotate(-3deg);border-radius:44px;padding:6px;
+  background:linear-gradient(170deg,#fff3a8,#f0a400 28%,#8a4a00 52%,#ffc93a 78%,#fff0a0);
+  box-shadow:0 26px 60px rgba(0,0,0,.7),0 0 70px rgba(255,170,0,.28)}
+.plaque i{display:block;width:100%;height:100%;border-radius:39px;
+  background:radial-gradient(700px 300px at 50% 0%,#5b1024 0%,#2a0712 55%,#13030a 100%);
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.18),inset 0 -30px 60px rgba(0,0,0,.55)}
+.hl{position:absolute;left:0;right:0;text-align:center;font:italic 900 132px M;letter-spacing:-3px;white-space:nowrap;transform:rotate(-3deg)}
+.hl span{display:block}
+.hl .b{color:#5a2600;-webkit-text-stroke:16px #3a1500;
+  text-shadow:0 7px 0 #3a1500,0 13px 0 #260d00,0 22px 26px rgba(0,0,0,.75)}
+.hl .f{position:absolute;left:0;right:0;top:0;
+  background:linear-gradient(180deg,#fffbd0 6%,#ffe85a 30%,#ffc21a 50%,#ff9300 68%,#ffb41e 80%,#fff0a0 96%);
+  -webkit-background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 16px rgba(255,190,40,.55))}
+.h1{top:612px}
+.h2{top:752px;font-size:184px;letter-spacing:-5px}
+.btn{position:absolute;left:150px;right:150px;top:1004px;height:124px;border-radius:70px;padding:6px;
+  background:linear-gradient(180deg,#fff7b8,#b86c00);box-shadow:0 16px 34px rgba(0,0,0,.65),0 0 60px rgba(255,190,30,.55)}
+.btn b{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:64px;
+  font:italic 900 66px M;letter-spacing:-1px;color:#2b1100;
+  background:linear-gradient(180deg,#fff27a 0%,#ffd21e 42%,#ffa800 58%,#ff8c00 100%);
+  box-shadow:inset 0 5px 0 rgba(255,255,255,.75),inset 0 -8px 14px rgba(140,60,0,.5);text-shadow:0 2px 0 rgba(255,240,150,.8)}
+.foot{position:absolute;left:0;right:0;bottom:22px;text-align:center;font:italic 900 19px M;letter-spacing:1.5px;color:rgba(255,255,255,.55)}
+.foot em{display:inline-block;border:2px solid rgba(255,255,255,.6);border-radius:50%;width:38px;height:38px;line-height:34px;font-size:15px;margin-right:10px;font-style:normal;letter-spacing:0}
+</style></head><body><div class="card">
+<div class="rays"></div><div class="grid"></div>
+<svg class="art" viewBox="0 0 1080 1200">
+<defs>
+ <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff2443" stop-opacity=".55"/><stop offset="1" stop-color="#ff2443" stop-opacity="0"/></linearGradient>
+ <linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6a78"/><stop offset=".35" stop-color="#f3122f"/><stop offset="1" stop-color="#8f0018"/></linearGradient>
+ <linearGradient id="red2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b52"/><stop offset="1" stop-color="#6e0012"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9fbff"/><stop offset="1" stop-color="#3aa0d8"/></linearGradient>
+ <radialGradient id="coin" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fffbd0"/><stop offset=".4" stop-color="#ffd02a"/><stop offset="1" stop-color="#b56a00"/></radialGradient>
+ <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+ <filter id="soft"><feGaussianBlur stdDeviation="3"/></filter>
+ <filter id="sh" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000" flood-opacity=".55"/></filter>
+ <linearGradient id="fg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".75" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="fade" maskUnits="userSpaceOnUse" x="-20" y="0" width="640" height="1200"><rect x="-20" y="0" width="630" height="1200" fill="url(#fg)"/></mask><g id="c"><ellipse rx="34" ry="34" fill="url(#coin)" stroke="#8a4e00" stroke-width="3"/><ellipse rx="24" ry="24" fill="none" stroke="#fff3a0" stroke-opacity=".8" stroke-width="3"/><text y="14" text-anchor="middle" font-family="M" font-style="italic" font-weight="900" font-size="38" fill="#8a4e00">$</text></g>
+ <path id="star" d="M0-18 L4-4 L18 0 L4 4 L0 18 L-4 4 L-18 0 L-4-4Z" fill="#fff6c0"/>
+</defs>
+<!-- curva de voo -->
+<path d="M-20 1010 C300 1000 470 800 610 430 L610 1200 L-20 1200Z" fill="url(#area)" mask="url(#fade)"/>
+<path d="M-20 1010 C300 1000 470 800 610 430" fill="none" stroke="#ff2443" stroke-width="26" filter="url(#glow)" opacity=".9"/>
+<path d="M-20 1010 C300 1000 470 800 610 430" fill="none" stroke="#ff4a62" stroke-width="10" stroke-linecap="round"/>
+<path d="M-20 1010 C300 1000 470 800 610 430" fill="none" stroke="#ffd0d6" stroke-width="3" stroke-linecap="round"/>
+<!-- moedas -->
+<g filter="url(#soft)" opacity=".75"><use href="#c" transform="translate(120 330) scale(.7,.5) rotate(-20)"/><use href="#c" transform="translate(985 560) scale(.75,.55) rotate(25)"/><use href="#c" transform="translate(70 560) scale(.5,.6)"/></g>
+<use href="#c" transform="translate(250 430) rotate(-18) scale(1.15,.95)"/>
+<use href="#c" transform="translate(380 300) rotate(22) scale(.8,1)"/>
+<use href="#c" transform="translate(975 150) rotate(14) scale(.8,.66)"/>
+<use href="#c" transform="translate(1000 420) rotate(-30) scale(.7,.9)"/>
+<use href="#c" transform="translate(165 505) rotate(35) scale(.62,.78)"/>
+<use href="#c" transform="translate(505 520) rotate(-12) scale(.72,.6)"/>
+<!-- brilhos -->
+<use href="#star" transform="translate(300 250) scale(1.4)"/><use href="#star" transform="translate(880 520) scale(1.1)"/><use href="#star" transform="translate(110 420)"/><use href="#star" transform="translate(1010 330) scale(.8)"/><use href="#star" transform="translate(560 250) scale(.7)"/><use href="#star" transform="translate(450 440) scale(.9)"/>
+<!-- aviao -->
+<g transform="translate(470 250) rotate(-20 215 100) scale(1.32)" filter="url(#sh)">
+ <ellipse cx="372" cy="98" rx="9" ry="78" fill="#fff" opacity=".22"/>
+ <ellipse cx="372" cy="98" rx="5" ry="78" fill="#fff" opacity=".28"/>
+ <path d="M72 94 L34 30 Q32 24 40 24 L84 24 Q92 24 98 32 L132 80Z" fill="url(#red2)" stroke="#4a000c" stroke-width="3"/>
+ <path d="M52 44 L80 44 M62 34 L70 54 M70 34 L62 54" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+ <ellipse cx="58" cy="100" rx="44" ry="9" fill="#8f0018" stroke="#4a000c" stroke-width="3"/>
+ <path d="M58 96 C60 68 150 54 252 56 C316 57 356 74 364 98 C356 124 304 136 242 136 C150 136 78 122 58 96Z" fill="url(#red)" stroke="#4a000c" stroke-width="3"/>
+ <path d="M78 100 C150 112 270 114 350 100" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+ <path d="M110 74 C170 62 250 60 320 70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+ <path d="M196 60 C206 30 262 30 280 60Z" fill="url(#glass)" stroke="#4a000c" stroke-width="3"/>
+ <path d="M238 34 L238 60" stroke="#4a000c" stroke-width="3"/>
+ <path d="M346 70 C372 76 376 120 346 126Z" fill="#2b2b33" stroke="#111" stroke-width="2"/>
+ <ellipse cx="368" cy="98" rx="8" ry="10" fill="#d9d9e2"/>
+ <path d="M226 132 L238 164 M262 132 L250 164" stroke="#2b2b33" stroke-width="7" stroke-linecap="round"/>
+ <circle cx="244" cy="170" r="17" fill="#17171c" stroke="#000" stroke-width="2"/><circle cx="244" cy="170" r="7" fill="#c9c9d4"/>
+ <path d="M150 102 L292 102 Q300 102 296 110 L262 166 Q256 176 240 178 L190 178 Q176 176 172 166 L146 110 Q144 102 150 102Z" fill="url(#red2)" stroke="#4a000c" stroke-width="3"/>
+ <path d="M162 112 L282 112" stroke="#ff8f9b" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+</g>
+</svg>
+<div class="logo">Aviator</div>
+<div class="plaque"><i></i></div>
+<div class="hl h1"><span class="b">DEPOSITOU,</span><span class="f">DEPOSITOU,</span></div>
+<div class="hl h2"><span class="b">GANHOU!</span><span class="f">GANHOU!</span></div>
+<div class="btn"><b>JOGUE AGORA&nbsp;»</b></div>
+<div class="foot"><em>18+</em>JOGUE COM RESPONSABILIDADE</div>
+<div class="frame"></div>
+</div></body></html>
