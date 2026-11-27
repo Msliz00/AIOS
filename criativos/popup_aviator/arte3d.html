@@ -1,0 +1,234 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<!-- Cena 3D (three.js) do pop-up Aviator v2: avião + moedas, fundo transparente.
+     Camadas: ?layer=back | front | near  (renderizadas por render_v2.mjs) -->
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from './vendor/RoomEnvironment.js';
+
+const W = 1080, H = 1200;
+const layer = new URLSearchParams(location.search).get('layer') || 'front';
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(2);
+renderer.setSize(W, H);
+renderer.setClearColor(0x000000, 0);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
+
+const CAM_Z = 20, FOV = 28;
+const camera = new THREE.PerspectiveCamera(FOV, W / H, 0.1, 100);
+camera.position.set(0, 0, CAM_Z);
+
+// pixel do layout (1080x1200) -> posição no mundo, na profundidade z
+function px(x, y, z = 0) {
+  const vh = 2 * (CAM_Z - z) * Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+  const vw = vh * W / H;
+  return new THREE.Vector3((x / W - 0.5) * vw, (0.5 - y / H) * vh, z);
+}
+
+// ---------- luzes ----------
+const key = new THREE.DirectionalLight(0xfff4e0, 2.6);
+key.position.set(-4, 7, 9);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 30 });
+key.shadow.bias = -0.0015; key.shadow.radius = 5;
+key.target.position.copy(px(730, 340));
+scene.add(key, key.target);
+const rimRed = new THREE.PointLight(0xff1a3a, 260, 0, 2);   // brilho vermelho vindo do canto inferior esquerdo
+rimRed.position.copy(px(60, 1080, -3)); scene.add(rimRed);
+const rimGold = new THREE.PointLight(0xffd9a0, 200, 0, 2);
+rimGold.position.set(7, 6, -3); scene.add(rimGold);
+const fill = new THREE.PointLight(0xffe2c0, 30, 0, 2);
+fill.position.set(2, -3, 7); scene.add(fill);
+
+// ---------- materiais ----------
+function stripeTexture() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 64;
+  const g = c.getContext('2d');
+  g.fillStyle = '#c90420'; g.fillRect(0, 0, 1024, 64);
+  // barriga um pouco mais escura (u≈.25)
+  const b = g.createLinearGradient(130, 0, 380, 0);
+  b.addColorStop(0, 'rgba(90,0,14,0)'); b.addColorStop(.5, 'rgba(90,0,14,.55)'); b.addColorStop(1, 'rgba(90,0,14,0)');
+  g.fillStyle = b; g.fillRect(130, 0, 250, 64);
+  g.fillStyle = '#ffffff';
+  g.fillRect(1024 * 0.035, 0, 1024 * 0.05, 64);
+  g.fillRect(1024 * 0.415, 0, 1024 * 0.05, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+const redPaint = (extra = {}) => new THREE.MeshPhysicalMaterial({
+  color: 0xc90420, metalness: 0.25, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.06,
+  envMapIntensity: 0.8, side: THREE.DoubleSide, ...extra });
+const matBody = redPaint({ color: 0xffffff, map: stripeTexture() });
+const matRed = redPaint();
+const matDark = new THREE.MeshStandardMaterial({ color: 0x1b1b22, metalness: 0.7, roughness: 0.35 });
+const matChrome = new THREE.MeshStandardMaterial({ color: 0xe8e8f0, metalness: 1, roughness: 0.12, envMapIntensity: 1.6 });
+const matGlass = new THREE.MeshPhysicalMaterial({ color: 0x8fdcff, metalness: 0.6, roughness: 0.05, clearcoat: 1, envMapIntensity: 2.2, emissive: 0x0a3550 });
+const matTire = new THREE.MeshStandardMaterial({ color: 0x0c0c10, metalness: 0.1, roughness: 0.7 });
+
+function mesh(geo, mat) { const m = new THREE.Mesh(geo, mat); m.castShadow = m.receiveShadow = true; return m; }
+
+// ---------- avião (nariz em +X, topo +Y, envergadura em Z) ----------
+function buildPlane() {
+  const p = new THREE.Group();
+
+  // fuselagem (torneada)
+  const prof = new THREE.SplineCurve([
+    [0.015, -2.45], [0.11, -2.3], [0.27, -1.6], [0.45, -0.8], [0.57, 0.0], [0.61, 0.8], [0.58, 1.4], [0.5, 1.78], [0.42, 1.92],
+  ].map(([r, y]) => new THREE.Vector2(r, y)));
+  const fus = mesh(new THREE.LatheGeometry(prof.getPoints(60), 72).rotateZ(-Math.PI / 2), matBody);
+  fus.scale.z = 0.88; p.add(fus);
+
+  // capô, anel cromado e spinner
+  const cowl = mesh(new THREE.CylinderGeometry(0.34, 0.425, 0.16, 48).rotateZ(-Math.PI / 2), matDark);
+  cowl.position.x = 1.99; cowl.scale.z = 0.88; p.add(cowl);
+  const ring = mesh(new THREE.TorusGeometry(0.425, 0.03, 16, 64).rotateY(Math.PI / 2), matChrome);
+  ring.position.x = 1.92; ring.scale.z = 0.88; p.add(ring);
+  const sp = new THREE.SplineCurve([[0.24, 0], [0.22, 0.14], [0.14, 0.3], [0.0, 0.4]].map(([r, y]) => new THREE.Vector2(r, y)));
+  const spinner = mesh(new THREE.LatheGeometry(sp.getPoints(20), 40).rotateZ(-Math.PI / 2), matChrome);
+  spinner.position.x = 2.06; p.add(spinner);
+
+  // hélice em movimento (disco translúcido + pás borradas)
+  const pc = document.createElement('canvas'); pc.width = pc.height = 512;
+  const g = pc.getContext('2d'); g.translate(256, 256);
+  const rg = g.createRadialGradient(0, 0, 20, 0, 0, 256);
+  rg.addColorStop(0, 'rgba(255,255,255,.0)'); rg.addColorStop(.25, 'rgba(255,255,255,.10)');
+  rg.addColorStop(.86, 'rgba(255,255,255,.17)'); rg.addColorStop(.93, 'rgba(255,230,200,.42)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = rg; g.beginPath(); g.arc(0, 0, 256, 0, 7); g.fill();
+  for (let i = 0; i < 3; i++) { // pás "congeladas" com motion blur
+    g.rotate(Math.PI * 2 / 3);
+    for (let k = -14; k <= 14; k++) {
+      g.save(); g.rotate(k * 0.022);
+      g.fillStyle = `rgba(40,40,48,${0.05 * (1 - Math.abs(k) / 15)})`;
+      g.beginPath(); g.ellipse(0, -128, 22, 118, 0, 0, 7); g.fill(); g.restore();
+    }
+  }
+  const pt = new THREE.CanvasTexture(pc); pt.colorSpace = THREE.SRGBColorSpace;
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(1.22, 64).rotateY(Math.PI / 2),
+    new THREE.MeshBasicMaterial({ map: pt, transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+  disc.position.x = 2.2; p.add(disc);
+
+  // asas / estabilizadores (planta extrudada com bordas arredondadas)
+  function wingGeo(span, rootA, rootB, tipA, tipB, thick) {
+    const s = new THREE.Shape();
+    s.moveTo(rootA, 0);
+    s.lineTo(tipA, span * 0.9);
+    s.quadraticCurveTo(tipA + 0.02, span, (tipA + tipB) / 2, span);
+    s.quadraticCurveTo(tipB - 0.02, span, tipB, span * 0.88);
+    s.lineTo(rootB, 0);
+    s.closePath();
+    const geo = new THREE.ExtrudeGeometry(s, { depth: thick, bevelEnabled: true, bevelThickness: thick * 0.75, bevelSize: 0.07, bevelSegments: 8, curveSegments: 24 });
+    geo.translate(0, 0, -thick / 2);
+    geo.rotateX(Math.PI / 2);          // envergadura -> +Z, espessura -> Y
+    return geo;
+  }
+  const wg = wingGeo(2.55, -0.62, 0.62, -0.3, 0.36, 0.07);
+  for (const s of [1, -1]) {
+    const w = mesh(wg, matRed); w.position.set(0.42, -0.24, s * 0.3); w.scale.z = s; w.rotation.x = -s * 0.1; p.add(w);
+    // faixa branca na ponta da asa
+    const tip = mesh(wingGeo(0.34, -0.33, 0.39, -0.3, 0.36, 0.075), new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.3, clearcoat: 1, side: THREE.DoubleSide }));
+    tip.position.set(0, 0, 1.9); w.add(tip);
+  }
+  const sg = wingGeo(1.05, -0.3, 0.3, -0.16, 0.14, 0.05);
+  for (const s of [1, -1]) { const w = mesh(sg, matRed); w.position.set(-1.95, 0.08, s * 0.08); w.scale.z = s; p.add(w); }
+
+  // deriva
+  const fs = new THREE.Shape();
+  fs.moveTo(0.42, 0); fs.lineTo(-0.18, 0.92); fs.quadraticCurveTo(-0.26, 1.04, -0.42, 1.02);
+  fs.lineTo(-0.6, 0.98); fs.quadraticCurveTo(-0.7, 0.96, -0.66, 0.84); fs.lineTo(-0.5, 0); fs.closePath();
+  const fg = new THREE.ExtrudeGeometry(fs, { depth: 0.05, bevelEnabled: true, bevelThickness: 0.035, bevelSize: 0.05, bevelSegments: 6 });
+  fg.translate(0, 0, -0.025);
+  const fin = mesh(fg, matRed); fin.position.set(-1.78, 0.12, 0); p.add(fin);
+
+  // cabine
+  const can = mesh(new THREE.SphereGeometry(1, 48, 32), matGlass);
+  can.scale.set(0.74, 0.4, 0.37); can.position.set(0.3, 0.47, 0); p.add(can);
+  const canBase = mesh(new THREE.TorusGeometry(1, 0.05, 12, 64).rotateX(Math.PI / 2), matDark);
+  canBase.scale.set(0.69, 1, 0.345); canBase.position.set(0.3, 0.53, 0); p.add(canBase);
+
+  // trem de pouso
+  for (const s of [1, -1]) {
+    const strut = mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.7, 12), matDark);
+    strut.position.set(0.62, -0.62, s * 0.78); strut.rotation.z = -0.25; p.add(strut);
+    const pant = mesh(new THREE.SphereGeometry(1, 32, 24), matRed);
+    pant.scale.set(0.42, 0.2, 0.15); pant.position.set(0.66, -0.98, s * 0.78); p.add(pant);
+    const wheel = mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.13, 32).rotateX(Math.PI / 2), matTire);
+    wheel.position.set(0.7, -1.06, s * 0.78); p.add(wheel);
+    const hub = mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.15, 20).rotateX(Math.PI / 2), matChrome);
+    hub.position.copy(wheel.position); p.add(hub);
+  }
+  return p;
+}
+
+// ---------- moeda ----------
+function coinFace() {
+  const mk = (bump) => {
+    const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+    g.fillStyle = bump ? '#808080' : '#ffc233'; g.fillRect(0, 0, 512, 512);
+    g.translate(256, 256);
+    g.lineWidth = 16; g.strokeStyle = bump ? '#fff' : '#ffd766'; g.beginPath(); g.arc(0, 0, 196, 0, 7); g.stroke();
+    g.lineWidth = 6; g.strokeStyle = bump ? '#444' : '#b8740a'; g.beginPath(); g.arc(0, 0, 178, 0, 7); g.stroke();
+    for (let i = 0; i < 40; i++) { g.rotate(Math.PI / 20); g.fillStyle = bump ? '#bbb' : '#ffd766'; g.fillRect(-4, -236, 8, 22); }
+    g.font = '900 300px Inter, Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.lineJoin = 'round'; g.lineWidth = 14; g.strokeStyle = bump ? '#333' : '#a86400'; g.strokeText('$', 0, 14);
+    g.fillStyle = bump ? '#fff' : '#ffe07a'; g.fillText('$', 0, 14);
+    const t = new THREE.CanvasTexture(c); if (!bump) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+  };
+  return { map: mk(false), bump: mk(true) };
+}
+const cf = coinFace();
+const matGold = new THREE.MeshStandardMaterial({ color: 0xffc233, metalness: 0.8, roughness: 0.26, envMapIntensity: 2.2, emissive: 0x7a4300 });
+const matFace = new THREE.MeshStandardMaterial({ color: 0xffffff, map: cf.map, bumpMap: cf.bump, bumpScale: 6, metalness: 0.8, roughness: 0.3, envMapIntensity: 2.2, emissive: 0x7a4300, emissiveMap: cf.map });
+function buildCoin() {
+  const c = new THREE.Group();
+  const edge = mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.1, 64, 1, true).rotateX(Math.PI / 2), matGold); c.add(edge);
+  const rim = mesh(new THREE.TorusGeometry(0.47, 0.055, 16, 72), matGold); c.add(rim);
+  for (const s of [1, -1]) {
+    const f = mesh(new THREE.CircleGeometry(0.47, 64), matFace); f.position.z = s * 0.04; if (s < 0) f.rotation.y = Math.PI; c.add(f);
+  }
+  return c;
+}
+// [x, y (px), z, tamanho, rotX, rotY, rotZ]
+const COINS = {
+  back: [
+    [120, 330, -6, 1.0, 0.5, 0.9, 0.2], [985, 590, -7, 1.1, -0.6, 0.5, 0.4], [60, 590, -8, 0.9, 0.2, -0.9, 0.1],
+    [640, 150, -9, 0.8, 0.7, 0.3, 0.6], [900, 60, -8, 0.8, -0.4, -0.7, 0.2], [30, 150, -7, 0.9, 0.9, 0.2, 0.3],
+    [420, 560, -9, 0.8, -0.2, 0.8, 0.5],
+  ],
+  front: [
+    [245, 440, 0, 1.0, -0.35, 0.45, -0.3], [372, 318, -1, 0.82, 0.55, -0.5, 0.35], [452, 105, -2, 0.0001, 0, 0, 0],
+    [1002, 452, 0, 0.74, 0.3, -0.85, -0.5], [150, 545, -1, 0.72, 0.8, 0.5, 0.6], [520, 548, -1, 0.7, -0.95, -0.2, -0.2],
+    [92, 250, -2, 0.7, 0.2, 0.75, 0.4], [1012, 975, 1, 0.95, -0.45, -0.55, 0.3], [70, 985, 1, 0.8, 0.6, 0.6, -0.4],
+  ],
+  near: [
+    [1062, 560, 6, 0.8, 0.5, -0.6, 0.4], [14, 800, 7, 0.8, -0.6, 0.7, -0.3],
+  ],
+};
+for (const [x, y, z, s, rx, ry, rz] of COINS[layer]) {
+  const c = buildCoin(); c.position.copy(px(x, y, z)); c.scale.setScalar(s); c.rotation.set(rx, ry, rz); scene.add(c);
+}
+
+if (layer === 'front') {
+  const plane = buildPlane();
+  plane.position.copy(px(730, 345, 0));
+  plane.scale.setScalar(1.0);
+  plane.rotation.order = 'ZYX';
+  plane.rotation.set(0.34, -0.4, 0.4); // rolagem, guinada, subida
+  scene.add(plane);
+}
+
+renderer.render(scene, camera);
+window.__done = true;
+</script></body></html>
